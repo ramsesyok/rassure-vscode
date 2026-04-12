@@ -1,0 +1,49 @@
+{
+  "name": "rassure-vscode",
+  "displayName": "Rassure",
+  "description": "ローカル駆動・データベースレスの課題管理用VS Code拡張",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rassure-vscode.openBoard",
+        "title": "Rassure: ボードを開く"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "compile": "tsc -p tsconfig.json",
+    "build": "npm run compile && npm run build:webview",
+    "build:webview": "vite build",
+    "watch": "tsc -p tsconfig.json --watch",
+    "watch:webview": "vite build --watch",
+    "pretest": "npm run compile",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/react": "^18.x",
+    "@types/react-dom": "^18.x",
+    "@types/vscode": "^1.85.0",
+    "@vitejs/plugin-react": "^4.x",
+    "typescript": "^5.x",
+    "vite": "^5.x"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.x",
+    "@emotion/styled": "^11.x",
+    "@fontsource/roboto": "^5.x",
+    "@mui/icons-material": "^6.x",
+    "@mui/material": "^6.x",
+    "dayjs": "^1.x",
+    "react": "^18.x",
+    "react-dom": "^18.x"
+  }
+}
