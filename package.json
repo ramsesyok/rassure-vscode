@@ -2,11 +2,13 @@
   "name": "rassure-vscode",
   "displayName": "Rassure",
   "description": "ローカル駆動・データベースレスの課題管理用VS Code拡張",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/ramsesyok/rassure-vscode"
