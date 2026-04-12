@@ -5,9 +5,11 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
 import { Ticket } from '../types';
@@ -51,10 +53,10 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
     }
   };
 
-  const metaRow = (label: string, value: React.ReactNode) => (
-    <Box sx={{ display: 'flex', gap: 1, mb: 0.5 }}>
-      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 80 }}>{label}</Typography>
-      <Box>{value}</Box>
+  const metaCell = (label: string, value: React.ReactNode) => (
+    <Box>
+      <Typography variant="caption" color="text.secondary" display="block">{label}</Typography>
+      <Box sx={{ mt: 0.25 }}>{value}</Box>
     </Box>
   );
 
@@ -87,14 +89,21 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
         {/* Metadata */}
         <Card variant="outlined">
           <CardContent>
-            {metaRow('指摘種別', <Typography variant="body2">{ticket.category || '—'}</Typography>)}
-            {metaRow('ステータス', <StatusChip status={ticket.status} />)}
-            {metaRow('重要度', <PriorityChip priority={ticket.priority} />)}
-            {metaRow('担当者', <Typography variant="body2">{ticket.assignee || '—'}</Typography>)}
-            {metaRow('期限', <DueDateLabel dueDate={ticket.dueDate} />)}
-            {metaRow('指摘者', <Typography variant="body2">{ticket.reporter}</Typography>)}
-            {metaRow('作成日', <Typography variant="body2">{dayjs(ticket.createdAt).format('YYYY/MM/DD HH:mm')}</Typography>)}
-            {metaRow('更新日', <Typography variant="body2">{dayjs(ticket.updatedAt).format('YYYY/MM/DD HH:mm')}</Typography>)}
+            <Grid container spacing={1}>
+              <Grid item xs={4}>{metaCell('指摘対象', <Typography variant="body2">{ticket.target || '—'}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell('指摘種別', <Typography variant="body2">{ticket.category || '—'}</Typography>)}</Grid>
+              <Grid item xs={4}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 2 }}>
+                  <StatusChip status={ticket.status} />
+                  <PriorityChip priority={ticket.priority} />
+                </Box>
+              </Grid>
+              <Grid item xs={4}>{metaCell('指摘者', <Typography variant="body2">{ticket.reporter}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell('担当者', <Typography variant="body2">{ticket.assignee || '—'}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell('期限', <DueDateLabel dueDate={ticket.dueDate} />)}</Grid>
+              <Grid item xs={4}>{metaCell('作成日', <Typography variant="body2">{dayjs(ticket.createdAt).format('YYYY/MM/DD HH:mm')}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell('更新日', <Typography variant="body2">{dayjs(ticket.updatedAt).format('YYYY/MM/DD HH:mm')}</Typography>)}</Grid>
+            </Grid>
           </CardContent>
         </Card>
 
@@ -122,15 +131,14 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
             fullWidth
             size="small"
           />
-          <Button
-            variant="contained"
+          <Fab
+            color="primary"
+            size="small"
             onClick={handleAddComment}
             disabled={!commentBody.trim() || submitting}
-            sx={{ minWidth: 48, height: 40 }}
-            startIcon={submitting ? <CircularProgress size={14} /> : <SendIcon />}
           >
-            送信
-          </Button>
+            {submitting ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+          </Fab>
         </Box>
       </Box>
 

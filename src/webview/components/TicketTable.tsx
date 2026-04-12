@@ -15,7 +15,7 @@ import { StatusChip } from './StatusChip';
 import { PriorityChip } from './PriorityChip';
 import { DueDateLabel } from './DueDateLabel';
 
-type SortKey = 'id' | 'target' | 'status' | 'priority' | 'assignee' | 'dueDate';
+type SortKey = 'id' | 'target' | 'category' | 'status' | 'priority' | 'assignee' | 'dueDate';
 
 interface Props {
   tickets: Ticket[];
@@ -72,10 +72,10 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
           <TableRow>
             <TableCell sx={{ width: 80 }}><SortHeader label="ID" k="id" /></TableCell>
             <TableCell sx={{ width: 120 }}><SortHeader label="指摘対象" k="target" /></TableCell>
-            <TableCell>説明</TableCell>
-            <TableCell sx={{ width: 120 }}>指摘種別</TableCell>
-            <TableCell sx={{ width: 110 }}><SortHeader label="ステータス" k="status" /></TableCell>
-            <TableCell sx={{ width: 80 }}><SortHeader label="重要度" k="priority" /></TableCell>
+            <TableCell sx={{ minWidth: 200 }}>説明</TableCell>
+            <TableCell sx={{ width: 120 }}><SortHeader label="指摘種別" k="category" /></TableCell>
+            <TableCell sx={{ width: 110 }}><SortHeader label="状況" k="status" /></TableCell>
+            <TableCell sx={{ width: 90, minWidth: 100 }}><SortHeader label="重要度" k="priority" /></TableCell>
             <TableCell sx={{ width: 100 }}><SortHeader label="担当者" k="assignee" /></TableCell>
             <TableCell sx={{ width: 110 }}><SortHeader label="期限" k="dueDate" /></TableCell>
           </TableRow>
@@ -99,7 +99,7 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
               <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{ticket.id}</TableCell>
               <TableCell>{ticket.target}</TableCell>
               <TableCell>
-                <Typography variant="body2" noWrap sx={{ maxWidth: 300 }}>
+                <Typography variant="body2" sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {ticket.description}
                 </Typography>
               </TableCell>
