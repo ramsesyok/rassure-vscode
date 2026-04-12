@@ -21,6 +21,11 @@ export class DetailPanel {
   private readonly _ticketId: string;
   private _disposables: vscode.Disposable[] = [];
 
+  static disposeAll(): void {
+    DetailPanel.panels.forEach(p => p.dispose());
+    DetailPanel.panels.clear();
+  }
+
   static createOrShow(context: vscode.ExtensionContext, storage: TicketStorage, ticketId: string): void {
     const existing = DetailPanel.panels.get(ticketId);
     if (existing) {

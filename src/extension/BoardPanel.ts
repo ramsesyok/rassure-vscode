@@ -22,7 +22,10 @@ export class BoardPanel {
 
   static createOrShow(context: vscode.ExtensionContext, storage: TicketStorage): void {
     if (BoardPanel.currentPanel) {
+      // 起点フォルダが変わるので旧フォルダの詳細パネルを全て閉じる
+      import('./DetailPanel').then(({ DetailPanel }) => DetailPanel.disposeAll());
       BoardPanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
+      BoardPanel.currentPanel.postPush('folderChanged');
       return;
     }
     const panel = vscode.window.createWebviewPanel(
