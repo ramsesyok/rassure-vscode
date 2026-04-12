@@ -31,7 +31,7 @@ export function useTicketList(): Result {
     fetch();
     // Listen for push notifications (e.g. after a ticket is saved from Detail panel)
     const unsub = onPush((type) => {
-      if (type === 'ticketSaved') {
+      if (type === 'ticketSaved' || type === 'folderChanged') {
         fetch();
       }
     });
