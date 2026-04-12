@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { BoardPanel } from './BoardPanel';
 import { TicketStorage } from './TicketStorage';
+import { exportToExcel } from './ExportService';
 
 let storage: TicketStorage;
 
@@ -62,6 +63,9 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('rassure-vscode.openBoard', () => {
       openBoardWithFolderSelection(context);
+    }),
+    vscode.commands.registerCommand('rassure-vscode.exportToExcel', () => {
+      exportToExcel(storage);
     })
   );
 }
