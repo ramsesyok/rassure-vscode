@@ -23,8 +23,26 @@ function formatComments(comments: { timestamp: string; author: string; body: str
   }).join('\n');
 }
 
+// 列定義（順序は出力列順）
+const COLUMNS: { name: string; width: number }[] = [
+  { name: 'ID',       width: 10 },
+  { name: '状況',     width: 12 },
+  { name: '重要度',   width: 10 },
+  { name: '指摘対象', width: 20 },
+  { name: '指摘種別', width: 16 },
+  { name: '説明',     width: 50 },
+  { name: 'コメント', width: 50 },
+  { name: '指摘者',   width: 14 },
+  { name: '担当者',   width: 14 },
+  { name: '期限',     width: 14 },
+  { name: '作成日',   width: 20 },
+  { name: '更新日',   width: 20 },
+];
+
+// 折り返しを適用する列名
+const WRAP_COLUMNS = new Set(['説明', 'コメント']);
+
 export async function exportToExcel(storage: TicketStorage): Promise<void> {
-  // 保存先をユーザーに選択させる
   const uri = await vscode.window.showSaveDialog({
     defaultUri: vscode.Uri.file('issues_export.xlsx'),
     filters: { 'Excel ファイル': ['xlsx'] },
@@ -45,59 +63,56 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
 
     const sheet = workbook.addWorksheet('課題一覧');
 
-    // 列定義
-    sheet.columns = [
-      { header: 'ID',       key: 'id',          width: 10 },
-      { header: '状況',     key: 'status',       width: 12 },
-      { header: '重要度',   key: 'priority',     width: 10 },
-      { header: '指摘対象', key: 'target',       width: 20 },
-      { header: '指摘種別', key: 'category',     width: 16 },
-      { header: '説明',     key: 'description',  width: 50 },
-      { header: 'コメント', key: 'comments',     width: 50 },
-      { header: '指摘者',   key: 'reporter',     width: 14 },
-      { header: '担当者',   key: 'assignee',     width: 14 },
-      { header: '期限',     key: 'dueDate',      width: 14 },
-      { header: '作成日',   key: 'createdAt',    width: 20 },
-      { header: '更新日',   key: 'updatedAt',    width: 20 },
-    ];
+    // データ行を二次元配列として構築
+    const rows: ExcelJS.CellValue[][] = tickets.map(ticket => [
+      ticket.id,
+      STATUS_LABELS[ticket.status]   ?? ticket.status,
+      PRIORITY_LABELS[ticket.priority] ?? ticket.priority,
+      ticket.target,
+      ticket.category,
+      ticket.description,
+      formatComments(ticket.comments ?? []),
+      ticket.reporter,
+      ticket.assignee,
+      ticket.dueDate,
+      ticket.createdAt ? new Date(ticket.createdAt).toLocaleString('ja-JP') : '',
+      ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString('ja-JP') : '',
+    ]);
 
-    // ヘッダー行のスタイル
-    const headerRow = sheet.getRow(1);
-    headerRow.font = { bold: true };
-    headerRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FF4472C4' }
-    };
-    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-    headerRow.commit();
+    // テーブルとして追加
+    sheet.addTable({
+      name: 'IssuesTable',
+      ref: 'A1',
+      headerRow: true,
+      style: {
+        theme: 'TableStyleMedium2',
+        showRowStripes: true,
+      },
+      columns: COLUMNS.map(c => ({ name: c.name, filterButton: true })),
+      rows,
+    });
 
-    // データ行
-    for (const ticket of tickets) {
-      const commentsText = formatComments(ticket.comments ?? []);
-      const row = sheet.addRow({
-        id:          ticket.id,
-        status:      STATUS_LABELS[ticket.status] ?? ticket.status,
-        priority:    PRIORITY_LABELS[ticket.priority] ?? ticket.priority,
-        target:      ticket.target,
-        category:    ticket.category,
-        description: ticket.description,
-        comments:    commentsText,
-        reporter:    ticket.reporter,
-        assignee:    ticket.assignee,
-        dueDate:     ticket.dueDate,
-        createdAt:   ticket.createdAt ? new Date(ticket.createdAt).toLocaleString('ja-JP') : '',
-        updatedAt:   ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString('ja-JP') : '',
-      });
+    // テーブル追加後に列幅を設定
+    COLUMNS.forEach((col, i) => {
+      sheet.getColumn(i + 1).width = col.width;
+    });
 
-      // 説明・コメントセルの折り返し設定
-      row.getCell('description').alignment = { wrapText: true, vertical: 'top' };
-      row.getCell('comments').alignment   = { wrapText: true, vertical: 'top' };
-      row.commit();
+    // 折り返しが必要な列のセル書式を再適用（データ行は2行目から）
+    const wrapColIndices = COLUMNS
+      .map((c, i) => ({ name: c.name, colNum: i + 1 }))
+      .filter(c => WRAP_COLUMNS.has(c.name));
+
+    for (let rowIdx = 2; rowIdx <= tickets.length + 1; rowIdx++) {
+      for (const { colNum } of wrapColIndices) {
+        sheet.getCell(rowIdx, colNum).alignment = {
+          vertical: 'top',
+          horizontal: 'left',
+          wrapText: true,
+        };
+      }
     }
 
-    // ヘッダー行を固定
+    // 先頭行（ヘッダー）を固定
     sheet.views = [{ state: 'frozen', ySplit: 1 }];
 
     await workbook.xlsx.writeFile(uri.fsPath);
