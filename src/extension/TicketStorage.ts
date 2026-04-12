@@ -216,9 +216,9 @@ export class TicketStorage {
   // Helpers
   // ──────────────────────────────────────────────
   private generateId(folderPath: string): string {
-    const files = fs.existsSync(folderPath) ? fs.readdirSync(folderPath).filter(f => f.match(/^T-\d+\.json$/)) : [];
-    const nums = files.map(f => parseInt(f.replace('T-', '').replace('.json', ''), 10)).filter(n => !isNaN(n));
+    const files = fs.existsSync(folderPath) ? fs.readdirSync(folderPath).filter(f => f.match(/^#\d+\.json$/)) : [];
+    const nums = files.map(f => parseInt(f.replace('#', '').replace('.json', ''), 10)).filter((n: number) => !isNaN(n));
     const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
-    return `T-${String(next).padStart(3, '0')}`;
+    return `#${String(next).padStart(3, '0')}`;
   }
 }
