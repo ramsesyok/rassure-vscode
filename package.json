@@ -15,7 +15,17 @@
         "command": "rassure-vscode.openBoard",
         "title": "Rassure: ボードを開く"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Rassure",
+      "properties": {
+        "rassure-vscode.username": {
+          "type": "string",
+          "default": "",
+          "description": "チケットに記録するユーザー名（未設定時はOSのユーザー名を使用します）"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run build",

@@ -32,6 +32,10 @@ export class TicketStorage {
   // User
   // ──────────────────────────────────────────────
   getCurrentUser(): string {
+    const configured = vscode.workspace.getConfiguration('rassure-vscode').get<string>('username');
+    if (configured && configured.trim()) {
+      return configured.trim();
+    }
     try {
       return os.userInfo().username;
     } catch {
