@@ -123,8 +123,8 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
           </Grid>
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth>
-              <InputLabel>ステータス</InputLabel>
-              <Select value={status} onChange={e => setStatus(e.target.value as Ticket['status'])} label="ステータス">
+              <InputLabel>状況</InputLabel>
+              <Select value={status} onChange={e => setStatus(e.target.value as Ticket['status'])} label="状況">
                 {STATUS_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
