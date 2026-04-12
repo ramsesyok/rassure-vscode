@@ -22,6 +22,7 @@ export class TicketStorage {
       case 'addComment':       return this.addComment((payload as { id: string; body: string }).id, (payload as { id: string; body: string }).body);
       case 'getCategories':    return this.getCategories();
       case 'getTargetSuggestions': return this.getTargetSuggestions();
+      case 'getAssigneeSuggestions': return this.getAssigneeSuggestions();
       default:
         throw new Error(`Unknown message type: ${type}`);
     }
@@ -207,6 +208,16 @@ export class TicketStorage {
       const tickets = this.getTicketList();
       const targets = new Set(tickets.map(t => t.target).filter(Boolean));
       return Array.from(targets);
+    } catch {
+      return [];
+    }
+  }
+
+  getAssigneeSuggestions(): string[] {
+    try {
+      const tickets = this.getTicketList();
+      const assignees = new Set(tickets.map(t => t.assignee).filter(Boolean));
+      return Array.from(assignees);
     } catch {
       return [];
     }

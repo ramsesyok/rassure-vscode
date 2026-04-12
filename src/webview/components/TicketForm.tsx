@@ -48,6 +48,7 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
   const [dueDate, setDueDate] = useState('');
   const [categories, setCategories] = useState<string[]>([]);
   const [targetSuggestions, setTargetSuggestions] = useState<string[]>([]);
+  const [assigneeSuggestions, setAssigneeSuggestions] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -62,6 +63,7 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
 
       postRequest<string[]>('getCategories').then(setCategories).catch(() => setCategories([]));
       postRequest<string[]>('getTargetSuggestions').then(setTargetSuggestions).catch(() => setTargetSuggestions([]));
+      postRequest<string[]>('getAssigneeSuggestions').then(setAssigneeSuggestions).catch(() => setAssigneeSuggestions([]));
     }
   }, [open, ticket]);
 
@@ -138,11 +140,12 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <TextField
-              label="担当者"
+            <Autocomplete
+              freeSolo
+              options={assigneeSuggestions}
               value={assignee}
-              onChange={e => setAssignee(e.target.value)}
-              fullWidth
+              onInputChange={(_, v) => setAssignee(v)}
+              renderInput={params => <TextField {...params} label="担当者" fullWidth />}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
