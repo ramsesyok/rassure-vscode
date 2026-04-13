@@ -2,7 +2,7 @@
   "name": "rassure-vscode",
   "displayName": "Rassure",
   "description": "ローカル駆動・データベースレスの課題管理用VS Code拡張",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "engines": {
     "vscode": "^1.85.0"
   },
