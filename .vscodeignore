@@ -7,5 +7,5 @@ vite.config.ts
 .gitignore
 **/*.map
 **/*.ts
-!out/**
+!out/extension.js
 !dist/**
