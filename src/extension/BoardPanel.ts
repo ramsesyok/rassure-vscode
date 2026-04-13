@@ -97,6 +97,7 @@ export class BoardPanel {
     // CSP は必ず1行で記述（改行があるとVS CodeのWebviewパーサーが誤解析する）
     const csp = [
       `default-src 'none'`,
+      `connect-src 'none'`,
       `style-src ${webview.cspSource} 'unsafe-inline'`,
       `font-src ${webview.cspSource} data:`,
       `img-src ${webview.cspSource} data:`,
