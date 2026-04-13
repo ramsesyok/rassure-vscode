@@ -176,7 +176,7 @@ export class TicketStorage {
   getCategories(): string[] {
     try {
       const folderPath = this.getFolderPath();
-      const catFile = path.join(folderPath, '指摘種別');
+      const catFile = path.join(folderPath, 'categories');
       if (fs.existsSync(catFile)) {
         const content = fs.readFileSync(catFile, 'utf-8');
         return content
@@ -197,7 +197,7 @@ export class TicketStorage {
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath, { recursive: true });
       }
-      const catFile = path.join(folderPath, '指摘種別');
+      const catFile = path.join(folderPath, 'categories');
       if (!fs.existsSync(catFile)) {
         const defaults = ['誤記', '記載不足', '要確認', '修正依頼', '質問'].join('\n');
         fs.writeFileSync(catFile, defaults, 'utf-8');
