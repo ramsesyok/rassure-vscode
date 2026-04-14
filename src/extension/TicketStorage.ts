@@ -207,6 +207,8 @@ export class TicketStorage {
     }
   }
 
+  static readonly DEFAULT_EXPORT_COLUMN_ORDER = ['ID','状況','重要度','指摘対象','指摘種別','説明','コメント','指摘者','担当者','期限','作成日','更新日'];
+
   getTargetSuggestions(): string[] {
     try {
       const tickets = this.getTicketList();
