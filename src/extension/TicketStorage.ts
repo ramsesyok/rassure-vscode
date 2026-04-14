@@ -232,10 +232,22 @@ export class TicketStorage {
   // ──────────────────────────────────────────────
   // Helpers
   // ──────────────────────────────────────────────
+  getIdPrefix(): string {
+    const configured = vscode.workspace.getConfiguration('rassure-vscode').get<string>('idPrefix');
+    return (configured && configured.trim()) ? configured.trim() : '#';
+  }
+
   private generateId(folderPath: string): string {
-    const files = fs.existsSync(folderPath) ? fs.readdirSync(folderPath).filter(f => f.match(/^#\d+\.json$/)) : [];
-    const nums = files.map(f => parseInt(f.replace('#', '').replace('.json', ''), 10)).filter((n: number) => !isNaN(n));
+    const prefix = this.getIdPrefix();
+    const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(`^${escapedPrefix}\\d+\\.json$`);
+    const files = fs.existsSync(folderPath)
+      ? fs.readdirSync(folderPath).filter((f: string) => pattern.test(f))
+      : [];
+    const nums = files
+      .map((f: string) => parseInt(f.slice(prefix.length, f.length - 5), 10))
+      .filter((n: number) => !isNaN(n));
     const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
-    return `#${String(next).padStart(3, '0')}`;
+    return `${prefix}${String(next).padStart(3, '0')}`;
   }
 }

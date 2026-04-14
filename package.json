@@ -34,6 +34,13 @@
           "default": "",
           "description": "チケットに記録するユーザー名（未設定時はOSのユーザー名を使用します）"
         },
+        "rassure-vscode.idPrefix": {
+          "type": "string",
+          "default": "#",
+          "maxLength": 5,
+          "pattern": "^[^\\\\/:*?\"<>|]+$",
+          "description": "チケットIDおよびファイル名の先頭に付与するプレフィックスを指定します。OSのファイル名禁止文字（\\ / : * ? \" < > |）は使用できません。"
+        },
         "rassure-vscode.exportColumnOrder": {
           "type": "array",
           "items": { "type": "string" },
