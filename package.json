@@ -2,7 +2,7 @@
   "name": "rassure-vscode",
   "displayName": "Rassure",
   "description": "ローカル駆動・データベースレスの課題管理用VS Code拡張",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -43,8 +43,23 @@
         },
         "rassure-vscode.exportColumnOrder": {
           "type": "array",
-          "items": { "type": "string" },
-          "default": ["ID","状況","重要度","指摘対象","指摘種別","説明","コメント","指摘者","担当者","期限","作成日","更新日"],
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "ID",
+            "状況",
+            "重要度",
+            "指摘対象",
+            "指摘種別",
+            "説明",
+            "コメント",
+            "指摘者",
+            "担当者",
+            "期限",
+            "作成日",
+            "更新日"
+          ],
           "description": "Excelエクスポート時のカラムの並び順を指定します。出力したい項目を上から順に並べてください。"
         }
       }
