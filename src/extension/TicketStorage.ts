@@ -23,6 +23,8 @@ export class TicketStorage {
       case 'getCategories':    return this.getCategories();
       case 'getTargetSuggestions': return this.getTargetSuggestions();
       case 'getAssigneeSuggestions': return this.getAssigneeSuggestions();
+      case 'getExportColumnOrder': return this.getExportColumnOrder();
+      case 'saveExportColumnOrder': return this.saveExportColumnOrder((payload as { order: string[] }).order);
       default:
         throw new Error(`Unknown message type: ${type}`);
     }
@@ -205,6 +207,20 @@ export class TicketStorage {
     } catch {
       // best effort
     }
+  }
+
+  // ──────────────────────────────────────────────
+  // Export column order (stored in globalState)
+  // ──────────────────────────────────────────────
+  static readonly DEFAULT_EXPORT_COLUMN_ORDER = ['ID','状況','重要度','指摘対象','指摘種別','説明','コメント','指摘者','担当者','期限','作成日','更新日'];
+
+  getExportColumnOrder(): string[] {
+    const saved = this.context.globalState.get<string[]>('rassure.exportColumnOrder');
+    return (saved && saved.length > 0) ? saved : TicketStorage.DEFAULT_EXPORT_COLUMN_ORDER;
+  }
+
+  async saveExportColumnOrder(order: string[]): Promise<void> {
+    await this.context.globalState.update('rassure.exportColumnOrder', order);
   }
 
   getTargetSuggestions(): string[] {

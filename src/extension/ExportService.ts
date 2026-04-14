@@ -23,21 +23,21 @@ function formatComments(comments: { timestamp: string; author: string; body: str
   }).join('\n');
 }
 
-// 列定義（順序は出力列順）
-const COLUMNS: { name: string; width: number }[] = [
-  { name: 'ID',       width: 10 },
-  { name: '状況',     width: 12 },
-  { name: '重要度',   width: 10 },
-  { name: '指摘対象', width: 20 },
-  { name: '指摘種別', width: 16 },
-  { name: '説明',     width: 50 },
-  { name: 'コメント', width: 50 },
-  { name: '指摘者',   width: 14 },
-  { name: '担当者',   width: 14 },
-  { name: '期限',     width: 14 },
-  { name: '作成日',   width: 20 },
-  { name: '更新日',   width: 20 },
-];
+// 全カラムのマスター定義（名前 → 幅）
+const COLUMN_WIDTH_MAP: Record<string, number> = {
+  'ID':       10,
+  '状況':     12,
+  '重要度':   10,
+  '指摘対象': 20,
+  '指摘種別': 16,
+  '説明':     50,
+  'コメント': 50,
+  '指摘者':   14,
+  '担当者':   14,
+  '期限':     14,
+  '作成日':   20,
+  '更新日':   20,
+};
 
 // 折り返しを適用する列名
 const WRAP_COLUMNS = new Set(['説明', 'コメント']);
@@ -57,27 +57,42 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
   try {
     const tickets = storage.getTicketList();
 
+    // globalState からカラム順序を取得（未設定時はデフォルトにフォールバック）
+    const columnOrder = storage.getExportColumnOrder();
+
+    // カラム定義を動的生成（マスターにない名前は幅 20 でフォールバック）
+    const COLUMNS = columnOrder.map(name => ({
+      name,
+      width: COLUMN_WIDTH_MAP[name] ?? 20,
+    }));
+
+    // チケットデータ → 各カラム名に対応した値を順番通りに並べる
+    const ticketValueMap = (ticket: ReturnType<typeof storage.getTicketList>[number]): Record<string, ExcelJS.CellValue> => ({
+      'ID':       ticket.id,
+      '状況':     STATUS_LABELS[ticket.status]   ?? ticket.status,
+      '重要度':   PRIORITY_LABELS[ticket.priority] ?? ticket.priority,
+      '指摘対象': ticket.target,
+      '指摘種別': ticket.category,
+      '説明':     ticket.description,
+      'コメント': formatComments(ticket.comments ?? []),
+      '指摘者':   ticket.reporter,
+      '担当者':   ticket.assignee,
+      '期限':     ticket.dueDate,
+      '作成日':   ticket.createdAt ? new Date(ticket.createdAt).toLocaleString('ja-JP') : '',
+      '更新日':   ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString('ja-JP') : '',
+    });
+
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'rassure-vscode';
     workbook.created = new Date();
 
     const sheet = workbook.addWorksheet('課題一覧');
 
-    // データ行を二次元配列として構築
-    const rows: ExcelJS.CellValue[][] = tickets.map(ticket => [
-      ticket.id,
-      STATUS_LABELS[ticket.status]   ?? ticket.status,
-      PRIORITY_LABELS[ticket.priority] ?? ticket.priority,
-      ticket.target,
-      ticket.category,
-      ticket.description,
-      formatComments(ticket.comments ?? []),
-      ticket.reporter,
-      ticket.assignee,
-      ticket.dueDate,
-      ticket.createdAt ? new Date(ticket.createdAt).toLocaleString('ja-JP') : '',
-      ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString('ja-JP') : '',
-    ]);
+    // データ行を二次元配列として構築（カラム順序に従ってマッピング）
+    const rows: ExcelJS.CellValue[][] = tickets.map(ticket => {
+      const valueMap = ticketValueMap(ticket);
+      return columnOrder.map(name => valueMap[name] ?? '');
+    });
 
     // テーブルとして追加
     sheet.addTable({
