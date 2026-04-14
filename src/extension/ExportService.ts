@@ -57,8 +57,13 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
   try {
     const tickets = storage.getTicketList();
 
-    // globalState からカラム順序を取得（未設定時はデフォルトにフォールバック）
-    const columnOrder = storage.getExportColumnOrder();
+    // VS Code設定からカラム順序を取得（未設定・空の場合はデフォルトにフォールバック）
+    const configOrder = vscode.workspace
+      .getConfiguration('rassure-vscode')
+      .get<string[]>('exportColumnOrder');
+    const columnOrder = (configOrder && configOrder.length > 0)
+      ? configOrder
+      : TicketStorage.DEFAULT_EXPORT_COLUMN_ORDER;
 
     // カラム定義を動的生成（マスターにない名前は幅 20 でフォールバック）
     const COLUMNS = columnOrder.map(name => ({
