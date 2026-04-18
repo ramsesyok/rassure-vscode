@@ -74,7 +74,8 @@
     "watch": "esbuild src/extension/extension.ts --bundle --outfile=out/extension.js --external:vscode --platform=node --format=cjs --watch",
     "watch:webview": "vite build --watch",
     "pretest": "npm run build:extension",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "package": "node scripts/package.js"
   },
   "devDependencies": {
     "@types/node": "^20.x",
