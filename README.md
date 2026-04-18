@@ -1,315 +1,316 @@
-# Rassure for VS Code — 操作マニュアル
+# Rassure for VS Code
 
-ローカルフォルダに JSON ファイルとしてチケットを保存する、**サーバーレス・オフライン完結**の課題管理 VS Code 拡張です。  
-データベースやサーバーの準備は一切不要。クローズドネットワーク環境でも動作します。
+A **serverless, fully offline** issue tracker for VS Code that stores tickets as JSON files in a local folder.  
+No database or server required — works in closed network environments.
 
 > [!WARNING]
-> **本ツールは少人数・小規模チームでの運用を前提としています。**  
-> チケットファイルへの排他制御・ロック機構は実装されていません。複数人が同じチケットを同時に編集した場合、後から保存した内容で上書きされ、変更が失われる可能性があります。  
-> ネットワーク共有フォルダで運用する際は、**同じチケットを同時に編集しない**よう、チーム内でのルール付けをおすすめします。
+> **This tool is designed for small teams.**  
+> There is no file locking or exclusive access control. If multiple people edit the same ticket simultaneously, the last save wins and earlier changes will be lost.  
+> When using a network shared folder, establish a team convention to **avoid editing the same ticket at the same time**.
+
+**[日本語ドキュメント](docs/README.ja.md)**
 
 ---
 
-## 目次
+## Table of Contents
 
-1. [インストール](#インストール)
-2. [はじめに — 保存フォルダの設定](#はじめに--保存フォルダの設定)
-3. [ボード画面](#ボード画面)
-4. [チケットの作成](#チケットの作成)
-5. [チケットの詳細・編集](#チケットの詳細編集)
-6. [コメントの追加](#コメントの追加)
-7. [Excel エクスポート](#excel-エクスポート)
-8. [設定のカスタマイズ](#設定のカスタマイズ)
-9. [指摘種別のカスタマイズ](#指摘種別のカスタマイズ)
-10. [チケットデータ形式（参考）](#チケットデータ形式参考)
-11. [開発・ビルド](#開発ビルド)
-
----
-
-## インストール
-
-VS Code の拡張機能マーケットプレイスから **Rassure** を検索してインストールするか、`.vsix` ファイルを手動でインストールしてください。
-
-**手動インストール（オフライン環境）:**
-
-1. `.vsix` ファイルを入手する
-2. VS Code のコマンドパレット（`Ctrl+Shift+P`）で `Extensions: Install from VSIX...` を実行する
-3. ファイルを選択してインストール
+1. [Installation](#installation)
+2. [Getting Started — Setting the Storage Folder](#getting-started--setting-the-storage-folder)
+3. [Board View](#board-view)
+4. [Creating a Ticket](#creating-a-ticket)
+5. [Ticket Detail & Edit](#ticket-detail--edit)
+6. [Adding Comments](#adding-comments)
+7. [Excel Export](#excel-export)
+8. [Settings](#settings)
+9. [Customizing Categories](#customizing-categories)
+10. [Ticket Data Format](#ticket-data-format)
+11. [Development & Build](#development--build)
 
 ---
 
-## はじめに — 保存フォルダの設定
+## Installation
 
-チケットを保存するフォルダを最初に設定します。
+Search for **Rassure** in the VS Code Extensions Marketplace, or install manually from a `.vsix` file.
 
-**コマンドパレット**（`Ctrl+Shift+P` / `Cmd+Shift+P`）を開き、以下のコマンドを実行します。
+**Manual installation (offline environment):**
+
+1. Obtain the `.vsix` file
+2. Open the Command Palette (`Ctrl+Shift+P`) and run `Extensions: Install from VSIX...`
+3. Select the file to install
+
+---
+
+## Getting Started — Setting the Storage Folder
+
+First, set the folder where tickets will be stored.
+
+Open the **Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
 
 ```
-Rassure: ボードを開く
+Rassure: Open Board
 ```
 
-![ボードを開くコマンドの実行](docs/images/01_open-command.png)
+![Open Board command](docs/images/01_open-command.png)
 
-ボード画面が開くと、上部にフォルダ選択欄が表示されます。
+The board opens with a folder selector at the top.
 
-![フォルダ選択欄](docs/images/02_folder-selector.png)
+![Folder selector](docs/images/02_folder-selector.png)
 
-フォルダの指定方法は 2 通りあります。
+There are two ways to specify a folder:
 
-| 方法 | 操作 |
-|------|------|
-| パスを直接入力 | テキストボックスにパスを入力して Enter |
-| ダイアログから選択 | 右端のフォルダアイコンをクリック |
+| Method | Action |
+|--------|--------|
+| Type a path directly | Enter the path in the text box and press Enter |
+| Browse with a dialog | Click the folder icon on the right |
 
-選択したフォルダは記憶され、次回以降は自動入力されます。  
-フォルダを変更したい場合は、コマンドを再実行するか、ボード右上の **「設定」ボタン**から変更できます。
+The selected folder is remembered and pre-filled on subsequent uses.  
+To change the folder, re-run the command or click the **Settings button** in the top-right of the board.
 
-> フォルダを切り替えると、開いている詳細画面は自動的に閉じられます。
-
----
-
-## ボード画面
-
-保存フォルダ内のチケットが一覧で表示されます。
-
-![ボード画面](docs/images/03_board-view.png)
-
-### 列の構成
-
-| 列 | 内容 |
-|----|------|
-| ID | チケット番号 |
-| 状況 | 未着手 / 対応中 / 解決済 / クローズ |
-| 重要度 | 高 / 中 / 低 |
-| 指摘対象 | 対象ファイル・画面名など |
-| 指摘種別 | カテゴリ |
-| 説明 | チケット本文の冒頭 |
-| 担当者 | 担当者名 |
-| 期限 | 対応期限 |
-
-### ボード右上のボタン
-
-| ボタン | 機能 |
-|--------|------|
-| 新規 | 新しいチケットを作成する |
-| Excel | チケット一覧を .xlsx に出力する |
-| 設定 | 保存フォルダを変更する |
+> Switching folders automatically closes any open detail panels.
 
 ---
 
-## チケットの作成
+## Board View
 
-ボード右上の **「新規」ボタン**をクリックすると、チケット作成フォームが別タブで開きます。
+All tickets in the storage folder are displayed as a table.
 
-![チケット作成フォーム](docs/images/04_ticket-create.png)
+![Board view](docs/images/03_board-view.png)
 
-### 入力項目
+### Columns
 
-| 項目 | 説明 | 必須 |
-|------|------|------|
-| 説明 | 課題の内容 | ○ |
-| 指摘対象 | 対象ファイル・画面名など | |
-| 指摘種別 | カテゴリ（プルダウン） | |
-| 状況 | 未着手 / 対応中 / 解決済 / クローズ | |
-| 重要度 | 高 / 中 / 低 | |
-| 担当者 | 担当者名 | |
-| 期限 | 対応期限（日付ピッカー） | |
-| 指摘者 | 登録者名（初期値は設定の表示名） | |
+| Column | Description |
+|--------|-------------|
+| ID | Ticket number |
+| Status | Open / In Progress / Resolved / Closed |
+| Priority | High / Medium / Low |
+| Target | Target file or screen name |
+| Category | Issue category |
+| Description | Beginning of the ticket body |
+| Assignee | Person responsible |
+| Due Date | Response deadline |
 
-入力後、**「保存」ボタン**をクリックするとチケットが JSON ファイルとして保存フォルダに作成されます。  
-チケット ID（`#001` など）は自動で採番されます。
+### Toolbar Buttons
 
----
-
-## チケットの詳細・編集
-
-ボードの行をクリックすると、詳細画面が別タブで開きます。
-
-![チケット詳細画面](docs/images/05_ticket-detail.png)
-
-**「編集」ボタン**をクリックすると各フィールドが編集可能になります。
-
-![チケット編集モード](docs/images/06_ticket-edit.png)
-
-編集後、**「保存」ボタン**で変更を保存します。「キャンセル」で編集前の状態に戻ります。
+| Button | Function |
+|--------|----------|
+| New | Create a new ticket |
+| Excel | Export ticket list to .xlsx |
+| Settings | Change the storage folder |
 
 ---
 
-## コメントの追加
+## Creating a Ticket
 
-詳細画面の下部にコメント入力欄があります。
+Click the **New button** in the top-right of the board to open the ticket creation form.
 
-![コメント入力欄](docs/images/07_comment.png)
+![Ticket creation form](docs/images/04_ticket-create.png)
 
-本文を入力して **「コメントを追加」ボタン**をクリックすると、投稿日時・投稿者名とともにコメントが保存されます。  
-コメントは時系列で表示され、チケット JSON ファイル内に記録されます。
+### Fields
+
+| Field | Description | Required |
+|-------|-------------|----------|
+| Description | Issue content | ✓ |
+| Target | Target file or screen name | |
+| Category | Category (dropdown) | |
+| Status | Open / In Progress / Resolved / Closed | |
+| Priority | High / Medium / Low | |
+| Assignee | Person responsible | |
+| Due Date | Deadline (date picker) | |
+| Reporter | Submitter name (defaults to the configured username) | |
+
+Click **Save** to create the ticket as a JSON file in the storage folder.  
+The ticket ID (e.g. `#001`) is assigned automatically.
 
 ---
 
-## Excel エクスポート
+## Ticket Detail & Edit
 
-ボード右上の **「Excel」ボタン**、またはコマンドパレットから実行できます。
+Click a row in the board to open the detail panel in a new tab.
+
+![Ticket detail](docs/images/05_ticket-detail.png)
+
+Click the **Edit button** to make fields editable.
+
+![Ticket edit mode](docs/images/06_ticket-edit.png)
+
+Click **Save** to apply changes, or **Cancel** to discard them.
+
+---
+
+## Adding Comments
+
+The comment input is at the bottom of the detail panel.
+
+![Comment input](docs/images/07_comment.png)
+
+Enter text and click the send button (or press `Ctrl+Enter`) to post a comment with a timestamp and author name.  
+Comments are stored chronologically inside the ticket JSON file.
+
+---
+
+## Excel Export
+
+Click the **Excel button** in the board toolbar, or use the Command Palette:
 
 ```
-Rassure: Excel にエクスポート
+Rassure: Export to Excel
 ```
 
-![Excel エクスポートダイアログ](docs/images/08_excel-export.png)
+![Excel export dialog](docs/images/08_excel-export.png)
 
-保存ダイアログが表示されるので、ファイル名と保存先を指定してください。
+A save dialog appears — choose a filename and destination.
 
-### 出力仕様
+### Export Details
 
-- Excel テーブル形式（`TableStyleMedium2`）で出力されるため、列ヘッダーのフィルター・並べ替えがすぐに使用できます
-- コメントが複数ある場合は 1 セル内にまとめて出力され、折り返し表示が適用されます
-- ボードを開いていなくても、設定済みのフォルダからチケットを読み込んで出力します
+- Output uses Excel table format (`TableStyleMedium2`) so column filters and sorting are immediately available
+- Multiple comments are combined into a single cell with text wrapping applied
+- The board does not need to be open — tickets are read directly from the configured folder
 
-### 出力列
+### Exported Columns
 
-| 列 | 内容 |
-|----|------|
-| ID | チケット番号 |
-| 状況 | 未着手 / 対応中 / 解決済 / クローズ |
-| 重要度 | 高 / 中 / 低 |
-| 指摘対象 | 対象ファイル・画面名など |
-| 指摘種別 | カテゴリ |
-| 説明 | チケット本文 |
-| コメント | 日時・投稿者・本文を時系列で結合 |
-| 指摘者 | 登録者名 |
-| 担当者 | 担当者名 |
-| 期限 | 対応期限 |
-| 作成日 | 登録日時 |
-| 更新日 | 最終更新日時 |
+| Column | Description |
+|--------|-------------|
+| ID | Ticket number |
+| Status | Open / In Progress / Resolved / Closed |
+| Priority | High / Medium / Low |
+| Target | Target file or screen name |
+| Category | Issue category |
+| Description | Full ticket body |
+| Comments | All comments joined chronologically |
+| Reporter | Submitter name |
+| Assignee | Person responsible |
+| Due Date | Deadline |
+| Created At | Creation timestamp |
+| Updated At | Last update timestamp |
 
-出力する列の順序・取捨選択は VS Code 設定でカスタマイズできます（[後述](#excel-エクスポートのカラムカスタマイズ)）。
+The column order and selection can be customized in VS Code settings ([see below](#excel-column-customization)).
 
 ---
 
-## 設定のカスタマイズ
+## Settings
 
-`Ctrl+,`（Mac: `Cmd+,`）で VS Code の設定を開き、検索欄に **`Rassure`** と入力すると設定項目が表示されます。
+Open VS Code settings with `Ctrl+,` (`Cmd+,` on Mac) and search for **`Rassure`**.
 
-![VS Code 設定画面](docs/images/09_vscode-setting.png)
+![VS Code settings](docs/images/09_vscode-setting.png)
 
+| Setting Key | Default | Description |
+|-------------|---------|-------------|
+| `rassure-vscode.username` | (OS username) | Display name recorded on tickets |
+| `rassure-vscode.idPrefix` | `#` | Prefix for ticket IDs and filenames |
+| `rassure-vscode.exportColumnOrder` | All 12 columns | Column order and selection for Excel export |
 
-| 設定キー | 既定値 | 説明 |
-|---|---|---|
-| `rassure-vscode.username` | （OS ユーザー名） | チケットに記録する表示名 |
-| `rassure-vscode.idPrefix` | `#` | チケット ID・ファイル名の先頭に付与するプレフィックス |
-| `rassure-vscode.exportColumnOrder` | 全 12 列 | Excel エクスポート時の列の順序・取捨選択 |
+### Ticket ID Prefix
 
-### チケット ID プレフィックスの変更
-
-`rassure-vscode.idPrefix` を変更すると、**新規作成するチケット**のファイル名と ID が新しいプレフィックスで採番されます。
+Changing `rassure-vscode.idPrefix` affects **newly created tickets** only.
 
 ```
-例: idPrefix を "No." に変更した場合
-  新規チケット → No.001.json（id: "No.001"）
-  既存チケット → #001.json のままで引き続き読み込まれます
+Example: changing idPrefix to "No."
+  New ticket  → No.001.json (id: "No.001")
+  Old tickets → #001.json — still loaded as-is
 ```
 
-- プレフィックスは最大 5 文字まで設定できます
-- OS のファイル名禁止文字（`\ / : * ? " < > |`）は使用できません（設定画面でエラーが表示されます）
-- プレフィックスを変更しても**既存チケットは削除・移動されません**。旧プレフィックスのファイルはそのまま一覧に表示されます
+- Maximum 5 characters
+- OS-reserved characters (`\ / : * ? " < > |`) are not allowed (the settings UI shows a validation error)
+- Existing tickets are never deleted or renamed when the prefix changes
 
-### Excel エクスポートのカラムカスタマイズ
+### Excel Column Customization
 
-`rassure-vscode.exportColumnOrder` では、出力する列の順序と項目を配列で指定します。
+`rassure-vscode.exportColumnOrder` accepts an array that controls the column order and which columns are included.
 
-- リスト内の文字列を並べ替えると出力列の順序が変わります
-- 不要な項目を削除するとその列は出力されません
-- 指定できる値: `ID` `状況` `重要度` `指摘対象` `指摘種別` `説明` `コメント` `指摘者` `担当者` `期限` `作成日` `更新日`
+- Reorder items to change the column order in the output
+- Remove an item to exclude that column
+- Available values: `ID` `状況` `重要度` `指摘対象` `指摘種別` `説明` `コメント` `指摘者` `担当者` `期限` `作成日` `更新日`
 
 ---
 
-## 指摘種別のカスタマイズ
+## Customizing Categories
 
-チケット保存フォルダに `categories` というテキストファイルを置くと、チケット作成・編集時の「指摘種別」プルダウンの選択肢をカスタマイズできます。
+Place a plain text file named `categories` in the ticket storage folder to customize the Category dropdown in the ticket form.
 
-ファイルが存在しない場合は、ボードを開いた際に以下の内容で自動生成されます。
+If the file does not exist, it is created automatically when the board opens with these defaults:
 
 ```
-誤記
-記載不足
-要確認
-修正依頼
-質問
+Typo
+Missing Info
+Needs Review
+Change Request
+Question
 ```
 
-1 行 1 カテゴリの形式でテキストエディタから自由に編集できます。編集後にボードを再読み込みすると反映されます。
+Edit the file with any text editor — one category per line. Reload the board to apply changes.
 
 ---
 
-## チケットデータ形式（参考）
+## Ticket Data Format
 
-チケットは保存フォルダに `#001.json` のような形式で保存されます（プレフィックスは変更可能）。
+Tickets are saved as files like `#001.json` in the storage folder (prefix is configurable).
 
 ```json
 {
   "id": "#001",
-  "description": "ログイン画面のボタンラベルに誤字あり",
+  "description": "Typo in the login screen button label",
   "target": "login.tsx",
-  "category": "誤記",
+  "category": "Typo",
   "status": "open",
   "priority": "medium",
-  "assignee": "yamada",
+  "assignee": "alice",
   "dueDate": "2026-04-30",
-  "reporter": "tanaka",
+  "reporter": "bob",
   "createdAt": "2026-04-12T09:00:00.000Z",
   "updatedAt": "2026-04-12T09:00:00.000Z",
   "comments": []
 }
 ```
 
-JSON はプレーンテキストなので Git 管理やネットワーク共有フォルダでのチーム共有が可能です。
+Plain JSON files can be shared via Git or a network folder.
 
-### status の値
+### `status` values
 
-| 値 | 表示 |
-|----|------|
-| `open` | 未着手 |
-| `in_progress` | 対応中 |
-| `resolved` | 解決済 |
-| `closed` | クローズ |
+| Value | Display |
+|-------|---------|
+| `open` | Open |
+| `in_progress` | In Progress |
+| `resolved` | Resolved |
+| `closed` | Closed |
 
-### priority の値
+### `priority` values
 
-| 値 | 表示 |
-|----|------|
-| `high` | 高 |
-| `medium` | 中 |
-| `low` | 低 |
+| Value | Display |
+|-------|---------|
+| `high` | High |
+| `medium` | Medium |
+| `low` | Low |
 
 ---
 
-## 開発・ビルド
+## Development & Build
 
-### 必要環境
+### Requirements
 
-- Node.js 18 以上
-- VS Code 1.85 以上
+- Node.js 18+
+- VS Code 1.85+
 
-### セットアップ
+### Setup
 
 ```bash
 npm install
 npm run build
 ```
 
-### デバッグ実行
+### Debug
 
-VS Code で `F5` を押すと Extension Development Host が起動します。
+Press `F5` in VS Code to launch an Extension Development Host.
 
-### ビルドスクリプト
+### Build Scripts
 
-| コマンド | 内容 |
-|----------|------|
-| `npm run compile` | Extension Host（TypeScript → CommonJS） |
-| `npm run build:webview` | Webview（React+MUI → Vite バンドル） |
-| `npm run build` | 上記両方を実行 |
-| `npm run watch` | Extension Host の TypeScript 監視コンパイル |
+| Command | Description |
+|---------|-------------|
+| `npm run compile` | Type-check Extension Host TypeScript |
+| `npm run build:webview` | Bundle Webview (React + MUI via Vite) |
+| `npm run build` | Run both of the above |
+| `npm run watch` | Watch-compile Extension Host TypeScript |
 
-### VSIX パッケージ作成
+### Packaging
 
 ```bash
 npx vsce package
@@ -317,6 +318,6 @@ npx vsce package
 
 ---
 
-## ライセンス
+## License
 
 MIT
