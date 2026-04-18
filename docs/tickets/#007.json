@@ -1,0 +1,21 @@
+{
+  "id": "#007",
+  "description": "エラーメッセージの文言が英語のままになっている\n\nAPI エラー発生時に表示されるトースト通知の文言が `An unexpected error occurred.` のまま日本語化されていない。\n他のエラーメッセージはすべて日本語になっているため、この箇所だけ抜け漏れている模様。",
+  "target": "src/utils/apiClient.ts",
+  "category": "誤記",
+  "status": "resolved",
+  "priority": "low",
+  "assignee": "sato",
+  "dueDate": "2026-04-17",
+  "reporter": "tanaka",
+  "createdAt": "2026-04-15T09:00:00.000Z",
+  "updatedAt": "2026-04-16T15:00:00.000Z",
+  "comments": [
+    {
+      "id": "c007-1",
+      "author": "sato",
+      "body": "「予期しないエラーが発生しました。しばらく経ってから再試行してください。」に修正しました。",
+      "createdAt": "2026-04-16T14:50:00.000Z"
+    }
+  ]
+}

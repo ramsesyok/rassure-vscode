@@ -1,0 +1,21 @@
+{
+  "id": "#005",
+  "description": "日付入力欄に過去の日付を設定できてしまう\n\n「期限日」や「予定日」の入力欄で、今日より前の日付を自由に入力・選択できる状態になっている。\n過去日付を設定した場合の仕様を確認したい。バリデーションを追加すべきか、警告表示のみでよいか。",
+  "target": "src/components/DatePickerField.tsx",
+  "category": "要確認",
+  "status": "open",
+  "priority": "medium",
+  "assignee": "sato",
+  "dueDate": "2026-04-25",
+  "reporter": "suzuki",
+  "createdAt": "2026-04-14T14:00:00.000Z",
+  "updatedAt": "2026-04-14T14:00:00.000Z",
+  "comments": [
+    {
+      "id": "c005-1",
+      "author": "sato",
+      "body": "仕様書を確認しましたが記載がありませんでした。プロジェクトオーナーに確認をとります。",
+      "createdAt": "2026-04-15T10:00:00.000Z"
+    }
+  ]
+}

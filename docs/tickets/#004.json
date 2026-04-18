@@ -1,0 +1,21 @@
+{
+  "id": "#004",
+  "description": "ファイルアップロード後にページを更新しないと添付ファイル一覧に反映されない\n\nファイルをアップロードした直後、ファイル一覧コンポーネントが再レンダリングされず古い状態のままになる。\nF5 でリロードすると正しく表示される。",
+  "target": "src/components/FileUploader.tsx",
+  "category": "修正依頼",
+  "status": "in_progress",
+  "priority": "high",
+  "assignee": "yamada",
+  "dueDate": "2026-04-21",
+  "reporter": "tanaka",
+  "createdAt": "2026-04-13T09:00:00.000Z",
+  "updatedAt": "2026-04-17T11:15:00.000Z",
+  "comments": [
+    {
+      "id": "c004-1",
+      "author": "yamada",
+      "body": "アップロード完了後に親コンポーネントへの状態通知が漏れていました。`onUploadComplete` コールバックを追加して対応中です。",
+      "createdAt": "2026-04-15T09:30:00.000Z"
+    }
+  ]
+}

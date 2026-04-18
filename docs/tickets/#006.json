@@ -1,0 +1,14 @@
+{
+  "id": "#006",
+  "description": "モバイル表示でナビゲーションメニューが画面外にはみ出す\n\nウィンドウ幅が 375px（iPhone SE 相当）以下になると、ヘッダーのナビゲーションリンクが右端で切れてスクロールもできない。\nハンバーガーメニューへの切り替えが必要と思われる。",
+  "target": "src/components/Header.tsx",
+  "category": "修正依頼",
+  "status": "open",
+  "priority": "medium",
+  "assignee": "",
+  "dueDate": "",
+  "reporter": "suzuki",
+  "createdAt": "2026-04-14T16:45:00.000Z",
+  "updatedAt": "2026-04-14T16:45:00.000Z",
+  "comments": []
+}
