@@ -1,0 +1,8 @@
+{
+  "extension.description": "Serverless, database-free issue tracker for VS Code",
+  "command.openBoard": "Rassure: Open Board",
+  "command.exportToExcel": "Rassure: Export to Excel",
+  "config.username.description": "Username recorded on tickets. Defaults to the OS username if not set.",
+  "config.idPrefix.description": "Prefix for ticket IDs and filenames. OS-reserved characters (\\ / : * ? \" < > |) are not allowed.",
+  "config.exportColumnOrder.description": "Column order for Excel export. List the columns you want from top to bottom."
+}
