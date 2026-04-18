@@ -1,0 +1,21 @@
+{
+  "id": "#002",
+  "description": "ユーザー一覧画面の「メールアドレス」列ヘッダーの表記が「メールアドレス」と「Email」で混在している\n\nテーブルヘッダーは「メールアドレス」だが、CSVエクスポート時の列名が「Email」になっており表記が統一されていない。",
+  "target": "src/pages/UserListPage.tsx",
+  "category": "誤記",
+  "status": "resolved",
+  "priority": "low",
+  "assignee": "sato",
+  "dueDate": "2026-04-18",
+  "reporter": "tanaka",
+  "createdAt": "2026-04-10T10:00:00.000Z",
+  "updatedAt": "2026-04-16T09:00:00.000Z",
+  "comments": [
+    {
+      "id": "c002-1",
+      "author": "sato",
+      "body": "CSVエクスポートの列名を「メールアドレス」に統一しました。PR #42 で対応済みです。",
+      "createdAt": "2026-04-14T16:20:00.000Z"
+    }
+  ]
+}

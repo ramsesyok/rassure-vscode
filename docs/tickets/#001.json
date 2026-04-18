@@ -1,0 +1,27 @@
+{
+  "id": "#001",
+  "description": "ログイン画面のパスワードリセットボタンが押せない\n\nパスワード入力欄に何も入力していない状態でも「パスワードを忘れた方はこちら」リンクが非活性になっており、リセット画面へ遷移できない。\nログイン失敗時のみリンクを表示する実装になっているが、仕様と異なる。",
+  "target": "src/pages/LoginPage.tsx",
+  "category": "修正依頼",
+  "status": "in_progress",
+  "priority": "high",
+  "assignee": "yamada",
+  "dueDate": "2026-04-22",
+  "reporter": "tanaka",
+  "createdAt": "2026-04-10T09:15:00.000Z",
+  "updatedAt": "2026-04-15T14:30:00.000Z",
+  "comments": [
+    {
+      "id": "c001-1",
+      "author": "yamada",
+      "body": "該当箇所を確認しました。`isLoginFailed` フラグの条件分岐が誤っています。修正対応します。",
+      "createdAt": "2026-04-11T10:00:00.000Z"
+    },
+    {
+      "id": "c001-2",
+      "author": "tanaka",
+      "body": "ありがとうございます。リセットメール送信後の画面遷移も合わせて確認をお願いします。",
+      "createdAt": "2026-04-11T10:45:00.000Z"
+    }
+  ]
+}

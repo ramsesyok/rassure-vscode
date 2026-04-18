@@ -1,0 +1,27 @@
+{
+  "id": "#008",
+  "description": "印刷プレビューでテーブルが2ページにまたがって見切れる\n\n一覧画面を印刷すると、テーブルの途中でページが切れてヘッダー行が2ページ目に引き継がれない。\n`@media print` の CSS でページブレーク制御を追加するか、thead の繰り返しを設定する必要がある。",
+  "target": "src/styles/print.css",
+  "category": "修正依頼",
+  "status": "closed",
+  "priority": "low",
+  "assignee": "sato",
+  "dueDate": "2026-04-10",
+  "reporter": "tanaka",
+  "createdAt": "2026-04-07T10:00:00.000Z",
+  "updatedAt": "2026-04-10T17:00:00.000Z",
+  "comments": [
+    {
+      "id": "c008-1",
+      "author": "sato",
+      "body": "`thead { display: table-header-group; }` を print.css に追加して対応しました。印刷プレビューで確認済みです。",
+      "createdAt": "2026-04-09T11:00:00.000Z"
+    },
+    {
+      "id": "c008-2",
+      "author": "tanaka",
+      "body": "確認しました。問題なく修正されています。クローズします。",
+      "createdAt": "2026-04-10T16:50:00.000Z"
+    }
+  ]
+}

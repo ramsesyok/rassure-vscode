@@ -1,0 +1,14 @@
+{
+  "id": "#003",
+  "description": "検索結果が0件のとき「データがありません」メッセージが表示されない\n\nキーワード検索で一致するデータがない場合、テーブルが空になるだけでユーザーへのフィードバックがない。\n「条件に一致するデータが見つかりませんでした」のような空状態の表示が必要。",
+  "target": "src/components/DataTable.tsx",
+  "category": "記載不足",
+  "status": "open",
+  "priority": "medium",
+  "assignee": "",
+  "dueDate": "2026-04-30",
+  "reporter": "suzuki",
+  "createdAt": "2026-04-12T13:30:00.000Z",
+  "updatedAt": "2026-04-12T13:30:00.000Z",
+  "comments": []
+}

@@ -1,0 +1,21 @@
+{
+  "id": "#009",
+  "description": "「保存」ボタンを連打すると同じデータが二重送信される\n\n保存処理中にボタンが非活性にならないため、通信が完了する前に再度クリックするとAPIが2回呼ばれてしまう。\nデータが重複登録される問題が本番環境で報告されている。",
+  "target": "src/components/EditForm.tsx",
+  "category": "修正依頼",
+  "status": "in_progress",
+  "priority": "high",
+  "assignee": "yamada",
+  "dueDate": "2026-04-19",
+  "reporter": "suzuki",
+  "createdAt": "2026-04-16T14:00:00.000Z",
+  "updatedAt": "2026-04-17T09:00:00.000Z",
+  "comments": [
+    {
+      "id": "c009-1",
+      "author": "yamada",
+      "body": "送信中は `isSubmitting` フラグで disabled にする対応と、API 側でのべき等性チェックを両方対応します。",
+      "createdAt": "2026-04-17T09:00:00.000Z"
+    }
+  ]
+}

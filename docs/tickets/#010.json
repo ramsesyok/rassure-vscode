@@ -1,0 +1,14 @@
+{
+  "id": "#010",
+  "description": "ダークモード時に一部テキストが背景色と同化して読めない\n\nOS のダークモードを有効にした状態でアプリを開くと、サイドバーの選択中メニュー項目のテキストカラーが背景色（#1e1e2e）と近い値（#2d2d4f）になっており読み取りにくい。\nコントラスト比が WCAG AA 基準（4.5:1）を満たしていない。",
+  "target": "src/styles/theme.ts",
+  "category": "要確認",
+  "status": "open",
+  "priority": "medium",
+  "assignee": "",
+  "dueDate": "2026-04-28",
+  "reporter": "tanaka",
+  "createdAt": "2026-04-17T11:30:00.000Z",
+  "updatedAt": "2026-04-17T11:30:00.000Z",
+  "comments": []
+}
