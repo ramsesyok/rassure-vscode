@@ -2,11 +2,13 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
+import { useTranslation } from 'react-i18next';
 import { TicketDetail } from './components/TicketDetail';
 import { useTicketDetail } from './hooks/useTicketDetail';
 import { useCurrentUser } from './hooks/useCurrentUser';
 
 export const DetailApp: React.FC = () => {
+  const { t } = useTranslation();
   // Extension Host が <meta name="rassure-ticket-id"> に注入
   const meta = document.querySelector<HTMLMetaElement>('meta[name="rassure-ticket-id"]');
   const ticketId = meta?.content ?? '';
@@ -24,7 +26,7 @@ export const DetailApp: React.FC = () => {
   if (error || !ticket) {
     return (
       <Box sx={{ p: 3 }}>
-        <Typography color="error">{error ?? 'チケットが見つかりません'}</Typography>
+        <Typography color="error">{error ?? t('detail.ticketNotFound')}</Typography>
       </Box>
     );
   }

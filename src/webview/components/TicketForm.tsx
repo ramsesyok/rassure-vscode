@@ -12,21 +12,9 @@ import InputLabel from '@mui/material/InputLabel';
 import Autocomplete from '@mui/material/Autocomplete';
 import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useTranslation } from 'react-i18next';
 import { postRequest } from '../vscodeApi';
 import { Ticket } from '../types';
-
-const STATUS_OPTIONS: { value: Ticket['status']; label: string }[] = [
-  { value: 'open', label: '未着手' },
-  { value: 'in_progress', label: '対応中' },
-  { value: 'resolved', label: '解決済' },
-  { value: 'closed', label: 'クローズ' }
-];
-
-const PRIORITY_OPTIONS: { value: Ticket['priority']; label: string }[] = [
-  { value: 'high', label: '高' },
-  { value: 'medium', label: '中' },
-  { value: 'low', label: '低' }
-];
 
 interface Props {
   open: boolean;
@@ -37,6 +25,7 @@ interface Props {
 }
 
 export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, onSaved }) => {
+  const { t } = useTranslation();
   const isEdit = Boolean(ticket?.id);
 
   const [description, setDescription] = useState('');
@@ -50,6 +39,19 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
   const [targetSuggestions, setTargetSuggestions] = useState<string[]>([]);
   const [assigneeSuggestions, setAssigneeSuggestions] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+
+  const STATUS_OPTIONS: { value: Ticket['status']; label: string }[] = [
+    { value: 'open',        label: t('status.open') },
+    { value: 'in_progress', label: t('status.in_progress') },
+    { value: 'resolved',    label: t('status.resolved') },
+    { value: 'closed',      label: t('status.closed') },
+  ];
+
+  const PRIORITY_OPTIONS: { value: Ticket['priority']; label: string }[] = [
+    { value: 'high',   label: t('priority.high') },
+    { value: 'medium', label: t('priority.medium') },
+    { value: 'low',    label: t('priority.low') },
+  ];
 
   useEffect(() => {
     if (open) {
@@ -91,12 +93,12 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{isEdit ? 'チケット編集' : '新規チケット'}</DialogTitle>
+      <DialogTitle>{isEdit ? t('form.editTicket') : t('form.newTicket')}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid item xs={12}>
             <TextField
-              label="説明 *"
+              label={t('form.description')}
               value={description}
               onChange={e => setDescription(e.target.value)}
               multiline
@@ -111,30 +113,30 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
               options={targetSuggestions}
               value={target}
               onInputChange={(_, v) => setTarget(v)}
-              renderInput={params => <TextField {...params} label="指摘対象" fullWidth />}
+              renderInput={params => <TextField {...params} label={t('form.target')} fullWidth />}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
-              <InputLabel>指摘種別</InputLabel>
-              <Select value={category} onChange={e => setCategory(e.target.value)} label="指摘種別">
-                <MenuItem value=""><em>未選択</em></MenuItem>
+              <InputLabel>{t('form.category')}</InputLabel>
+              <Select value={category} onChange={e => setCategory(e.target.value)} label={t('form.category')}>
+                <MenuItem value=""><em>{t('form.noneSelected')}</em></MenuItem>
                 {categories.map(c => <MenuItem key={c} value={c}>{c}</MenuItem>)}
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth>
-              <InputLabel>状況</InputLabel>
-              <Select value={status} onChange={e => setStatus(e.target.value as Ticket['status'])} label="状況">
+              <InputLabel>{t('form.status')}</InputLabel>
+              <Select value={status} onChange={e => setStatus(e.target.value as Ticket['status'])} label={t('form.status')}>
                 {STATUS_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={4}>
             <FormControl fullWidth>
-              <InputLabel>重要度</InputLabel>
-              <Select value={priority} onChange={e => setPriority(e.target.value as Ticket['priority'])} label="重要度">
+              <InputLabel>{t('form.priority')}</InputLabel>
+              <Select value={priority} onChange={e => setPriority(e.target.value as Ticket['priority'])} label={t('form.priority')}>
                 {PRIORITY_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
@@ -145,12 +147,12 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
               options={assigneeSuggestions}
               value={assignee}
               onInputChange={(_, v) => setAssignee(v)}
-              renderInput={params => <TextField {...params} label="担当者" fullWidth />}
+              renderInput={params => <TextField {...params} label={t('form.assignee')} fullWidth />}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
-              label="期限"
+              label={t('form.dueDate')}
               type="date"
               value={dueDate}
               onChange={e => setDueDate(e.target.value)}
@@ -161,14 +163,14 @@ export const TicketForm: React.FC<Props> = ({ open, ticket, reporter, onClose, o
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>キャンセル</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSave}
           disabled={!description.trim() || saving}
           startIcon={saving ? <CircularProgress size={16} /> : undefined}
         >
-          保存
+          {t('common.save')}
         </Button>
       </DialogActions>
     </Dialog>

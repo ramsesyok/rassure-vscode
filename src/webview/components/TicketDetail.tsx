@@ -8,10 +8,10 @@ import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import EditIcon from '@mui/icons-material/Edit';
 import SendIcon from '@mui/icons-material/Send';
+import { useTranslation } from 'react-i18next';
 import { Ticket } from '../types';
 import { StatusChip } from './StatusChip';
 import { PriorityChip } from './PriorityChip';
@@ -28,6 +28,7 @@ interface Props {
 }
 
 export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }) => {
+  const { t } = useTranslation();
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -68,10 +69,10 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
           <Typography component="span" variant="caption" color="text.secondary" sx={{ mr: 1, fontFamily: 'monospace' }}>
             {ticket.id}
           </Typography>
-          {ticket.target || '（指摘対象なし）'}
+          {ticket.target || t('detail.noTarget')}
         </Typography>
         <Button size="small" startIcon={<EditIcon />} onClick={() => setEditOpen(true)}>
-          編集
+          {t('common.edit')}
         </Button>
       </Box>
 
@@ -79,7 +80,7 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
         {/* Description */}
         <Card variant="outlined">
           <CardContent>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>説明</Typography>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>{t('detail.description')}</Typography>
             <Typography variant="body2" component="pre" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontFamily: 'inherit' }}>
               {ticket.description}
             </Typography>
@@ -90,19 +91,19 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
         <Card variant="outlined">
           <CardContent>
             <Grid container spacing={1}>
-              <Grid item xs={4}>{metaCell('指摘対象', <Typography variant="body2">{ticket.target || '—'}</Typography>)}</Grid>
-              <Grid item xs={4}>{metaCell('指摘種別', <Typography variant="body2">{ticket.category || '—'}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.target'), <Typography variant="body2">{ticket.target || '—'}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.category'), <Typography variant="body2">{ticket.category || '—'}</Typography>)}</Grid>
               <Grid item xs={4}>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 2 }}>
                   <StatusChip status={ticket.status} />
                   <PriorityChip priority={ticket.priority} />
                 </Box>
               </Grid>
-              <Grid item xs={4}>{metaCell('指摘者', <Typography variant="body2">{ticket.reporter}</Typography>)}</Grid>
-              <Grid item xs={4}>{metaCell('担当者', <Typography variant="body2">{ticket.assignee || '—'}</Typography>)}</Grid>
-              <Grid item xs={4}>{metaCell('期限', <DueDateLabel dueDate={ticket.dueDate} />)}</Grid>
-              <Grid item xs={4}>{metaCell('作成日', <Typography variant="body2">{dayjs(ticket.createdAt).format('YYYY/MM/DD HH:mm')}</Typography>)}</Grid>
-              <Grid item xs={4}>{metaCell('更新日', <Typography variant="body2">{dayjs(ticket.updatedAt).format('YYYY/MM/DD HH:mm')}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.reporter'), <Typography variant="body2">{ticket.reporter}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.assignee'), <Typography variant="body2">{ticket.assignee || '—'}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.dueDate'), <DueDateLabel dueDate={ticket.dueDate} />)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.createdAt'), <Typography variant="body2">{dayjs(ticket.createdAt).format('YYYY/MM/DD HH:mm')}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.updatedAt'), <Typography variant="body2">{dayjs(ticket.updatedAt).format('YYYY/MM/DD HH:mm')}</Typography>)}</Grid>
             </Grid>
           </CardContent>
         </Card>
@@ -110,7 +111,7 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
         {/* Comments */}
         <Box>
           <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-            コメント ({ticket.comments?.length ?? 0})
+            {t('detail.comments')} ({ticket.comments?.length ?? 0})
           </Typography>
           <CommentList comments={ticket.comments ?? []} currentUser={currentUser} />
         </Box>
@@ -123,7 +124,7 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
             multiline
             minRows={2}
             maxRows={6}
-            placeholder="コメントを追加... (Ctrl+Enter で送信)"
+            placeholder={t('detail.commentPlaceholder')}
             value={commentBody}
             onChange={e => setCommentBody(e.target.value)}
             onKeyDown={handleKeyDown}

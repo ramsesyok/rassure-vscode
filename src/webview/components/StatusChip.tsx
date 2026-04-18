@@ -1,6 +1,7 @@
 import React from 'react';
 import Chip from '@mui/material/Chip';
-import { Ticket, STATUS_LABELS } from '../types';
+import { useTranslation } from 'react-i18next';
+import { Ticket } from '../types';
 
 const STATUS_COLORS: Record<Ticket['status'], 'default' | 'primary' | 'success' | 'error'> = {
   open: 'default',
@@ -14,11 +15,14 @@ interface Props {
   size?: 'small' | 'medium';
 }
 
-export const StatusChip: React.FC<Props> = ({ status, size = 'small' }) => (
-  <Chip
-    label={STATUS_LABELS[status]}
-    color={STATUS_COLORS[status]}
-    size={size}
-    variant="outlined"
-  />
-);
+export const StatusChip: React.FC<Props> = ({ status, size = 'small' }) => {
+  const { t } = useTranslation();
+  return (
+    <Chip
+      label={t(`status.${status}`)}
+      color={STATUS_COLORS[status]}
+      size={size}
+      variant="outlined"
+    />
+  );
+};

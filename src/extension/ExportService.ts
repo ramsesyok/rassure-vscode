@@ -1,63 +1,85 @@
 import * as vscode from 'vscode';
 import * as ExcelJS from 'exceljs';
 import { TicketStorage } from './TicketStorage';
+import { t, getLocale } from './locale';
 
-const STATUS_LABELS: Record<string, string> = {
-  open: '未着手',
-  in_progress: '対応中',
-  resolved: '解決済',
-  closed: 'クローズ'
-};
+function getStatusLabel(status: string): string {
+  const key = `status.${status}` as 'status.open';
+  const labels: Record<string, string> = {
+    open:        getLocale() === 'ja' ? '未着手' : 'Open',
+    in_progress: getLocale() === 'ja' ? '対応中' : 'In Progress',
+    resolved:    getLocale() === 'ja' ? '解決済' : 'Resolved',
+    closed:      getLocale() === 'ja' ? 'クローズ' : 'Closed',
+  };
+  return labels[status] ?? status;
+}
 
-const PRIORITY_LABELS: Record<string, string> = {
-  high: '高',
-  medium: '中',
-  low: '低'
-};
+function getPriorityLabel(priority: string): string {
+  const labels: Record<string, string> = {
+    high:   getLocale() === 'ja' ? '高' : 'High',
+    medium: getLocale() === 'ja' ? '中' : 'Medium',
+    low:    getLocale() === 'ja' ? '低' : 'Low',
+  };
+  return labels[priority] ?? priority;
+}
 
 function formatComments(comments: { timestamp: string; author: string; body: string }[]): string {
   if (!comments || comments.length === 0) return '';
+  const locale = getLocale();
   return comments.map(c => {
-    const date = new Date(c.timestamp).toLocaleString('ja-JP');
+    const date = new Date(c.timestamp).toLocaleString(locale === 'ja' ? 'ja-JP' : 'en-US');
     return `[${date}] ${c.author}\n${c.body}`;
   }).join('\n');
 }
 
-// 全カラムのマスター定義（名前 → 幅）
-const COLUMN_WIDTH_MAP: Record<string, number> = {
-  'ID':       10,
-  '状況':     12,
-  '重要度':   10,
-  '指摘対象': 20,
-  '指摘種別': 16,
-  '説明':     50,
-  'コメント': 50,
-  '指摘者':   14,
-  '担当者':   14,
-  '期限':     14,
-  '作成日':   20,
-  '更新日':   20,
+// Japanese column key → column metadata (width, wrap flag)
+const COLUMN_META: Record<string, { width: number; wrap?: boolean }> = {
+  'ID':       { width: 10 },
+  '状況':     { width: 12 },
+  '重要度':   { width: 10 },
+  '指摘対象': { width: 20 },
+  '指摘種別': { width: 16 },
+  '説明':     { width: 50, wrap: true },
+  'コメント': { width: 50, wrap: true },
+  '指摘者':   { width: 14 },
+  '担当者':   { width: 14 },
+  '期限':     { width: 14 },
+  '作成日':   { width: 20 },
+  '更新日':   { width: 20 },
 };
 
-// 折り返しを適用する列名
-const WRAP_COLUMNS = new Set(['説明', 'コメント']);
+// Japanese column key → NLS key for localized header label
+const COLUMN_NLS: Record<string, Parameters<typeof t>[0]> = {
+  'ID':       'col.id',
+  '状況':     'col.status',
+  '重要度':   'col.priority',
+  '指摘対象': 'col.target',
+  '指摘種別': 'col.category',
+  '説明':     'col.description',
+  'コメント': 'col.comments',
+  '指摘者':   'col.reporter',
+  '担当者':   'col.assignee',
+  '期限':     'col.dueDate',
+  '作成日':   'col.createdAt',
+  '更新日':   'col.updatedAt',
+};
 
 export async function exportToExcel(storage: TicketStorage): Promise<void> {
   const uri = await vscode.window.showSaveDialog({
     defaultUri: vscode.Uri.file('issues_export.xlsx'),
-    filters: { 'Excel ファイル': ['xlsx'] },
-    title: 'エクスポート先を選択'
+    filters: { [t('export.fileFilter')]: ['xlsx'] },
+    title: t('export.dialogTitle')
   });
   if (!uri) return;
 
   const statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-  statusItem.text = '$(loading~spin) Rassure: Excel 出力中...';
+  statusItem.text = t('export.statusBar');
   statusItem.show();
 
   try {
     const tickets = storage.getTicketList();
+    const locale = getLocale();
 
-    // VS Code設定からカラム順序を取得（未設定・空の場合はデフォルトにフォールバック）
     const configOrder = vscode.workspace
       .getConfiguration('rassure-vscode')
       .get<string[]>('exportColumnOrder');
@@ -65,17 +87,17 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
       ? configOrder
       : TicketStorage.DEFAULT_EXPORT_COLUMN_ORDER;
 
-    // カラム定義を動的生成（マスターにない名前は幅 20 でフォールバック）
-    const COLUMNS = columnOrder.map(name => ({
-      name,
-      width: COLUMN_WIDTH_MAP[name] ?? 20,
+    const COLUMNS = columnOrder.map(jaKey => ({
+      jaKey,
+      label: COLUMN_NLS[jaKey] ? t(COLUMN_NLS[jaKey]) : jaKey,
+      width: COLUMN_META[jaKey]?.width ?? 20,
+      wrap:  COLUMN_META[jaKey]?.wrap ?? false,
     }));
 
-    // チケットデータ → 各カラム名に対応した値を順番通りに並べる
     const ticketValueMap = (ticket: ReturnType<typeof storage.getTicketList>[number]): Record<string, ExcelJS.CellValue> => ({
       'ID':       ticket.id,
-      '状況':     STATUS_LABELS[ticket.status]   ?? ticket.status,
-      '重要度':   PRIORITY_LABELS[ticket.priority] ?? ticket.priority,
+      '状況':     getStatusLabel(ticket.status),
+      '重要度':   getPriorityLabel(ticket.priority),
       '指摘対象': ticket.target,
       '指摘種別': ticket.category,
       '説明':     ticket.description,
@@ -83,23 +105,21 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
       '指摘者':   ticket.reporter,
       '担当者':   ticket.assignee,
       '期限':     ticket.dueDate,
-      '作成日':   ticket.createdAt ? new Date(ticket.createdAt).toLocaleString('ja-JP') : '',
-      '更新日':   ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString('ja-JP') : '',
+      '作成日':   ticket.createdAt ? new Date(ticket.createdAt).toLocaleString(locale === 'ja' ? 'ja-JP' : 'en-US') : '',
+      '更新日':   ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString(locale === 'ja' ? 'ja-JP' : 'en-US') : '',
     });
 
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'rassure-vscode';
     workbook.created = new Date();
 
-    const sheet = workbook.addWorksheet('課題一覧');
+    const sheet = workbook.addWorksheet(t('worksheet.name'));
 
-    // データ行を二次元配列として構築（カラム順序に従ってマッピング）
     const rows: ExcelJS.CellValue[][] = tickets.map(ticket => {
       const valueMap = ticketValueMap(ticket);
-      return columnOrder.map(name => valueMap[name] ?? '');
+      return columnOrder.map(jaKey => valueMap[jaKey] ?? '');
     });
 
-    // テーブルとして追加
     sheet.addTable({
       name: 'IssuesTable',
       ref: 'A1',
@@ -108,19 +128,17 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
         theme: 'TableStyleMedium2',
         showRowStripes: true,
       },
-      columns: COLUMNS.map(c => ({ name: c.name, filterButton: true })),
+      columns: COLUMNS.map(c => ({ name: c.label, filterButton: true })),
       rows,
     });
 
-    // テーブル追加後に列幅を設定
     COLUMNS.forEach((col, i) => {
       sheet.getColumn(i + 1).width = col.width;
     });
 
-    // 折り返しが必要な列のセル書式を再適用（データ行は2行目から）
     const wrapColIndices = COLUMNS
-      .map((c, i) => ({ name: c.name, colNum: i + 1 }))
-      .filter(c => WRAP_COLUMNS.has(c.name));
+      .map((c, i) => ({ wrap: c.wrap, colNum: i + 1 }))
+      .filter(c => c.wrap);
 
     for (let rowIdx = 2; rowIdx <= tickets.length + 1; rowIdx++) {
       for (const { colNum } of wrapColIndices) {
@@ -132,18 +150,15 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
       }
     }
 
-    // 先頭行（ヘッダー）を固定
     sheet.views = [{ state: 'frozen', ySplit: 1 }];
 
     await workbook.xlsx.writeFile(uri.fsPath);
 
     statusItem.dispose();
-    vscode.window.showInformationMessage(
-      `Rassure: ${tickets.length} 件の課題を Excel にエクスポートしました → ${uri.fsPath}`
-    );
+    vscode.window.showInformationMessage(t('export.success', tickets.length, uri.fsPath));
   } catch (e) {
     statusItem.dispose();
     const msg = e instanceof Error ? e.message : String(e);
-    vscode.window.showErrorMessage(`Rassure: Excel エクスポートに失敗しました — ${msg}`);
+    vscode.window.showErrorMessage(t('export.error', msg));
   }
 }

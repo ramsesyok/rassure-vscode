@@ -10,6 +10,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { useTranslation } from 'react-i18next';
 import { Ticket } from '../types';
 import { StatusChip } from './StatusChip';
 import { PriorityChip } from './PriorityChip';
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelectTicket }) => {
+  const { t } = useTranslation();
   const [sortKey, setSortKey] = useState<SortKey>('id');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
@@ -70,14 +72,14 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
       <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: 80 }}><SortHeader label="ID" k="id" /></TableCell>
-            <TableCell sx={{ width: 120 }}><SortHeader label="指摘対象" k="target" /></TableCell>
-            <TableCell sx={{ minWidth: 200 }}>説明</TableCell>
-            <TableCell sx={{ width: 120 }}><SortHeader label="指摘種別" k="category" /></TableCell>
-            <TableCell sx={{ width: 110 }}><SortHeader label="状況" k="status" /></TableCell>
-            <TableCell sx={{ width: 90, minWidth: 100 }}><SortHeader label="重要度" k="priority" /></TableCell>
-            <TableCell sx={{ width: 100 }}><SortHeader label="担当者" k="assignee" /></TableCell>
-            <TableCell sx={{ width: 110 }}><SortHeader label="期限" k="dueDate" /></TableCell>
+            <TableCell sx={{ width: 80 }}><SortHeader label={t('table.id')} k="id" /></TableCell>
+            <TableCell sx={{ width: 120 }}><SortHeader label={t('table.target')} k="target" /></TableCell>
+            <TableCell sx={{ minWidth: 200 }}>{t('table.description')}</TableCell>
+            <TableCell sx={{ width: 120 }}><SortHeader label={t('table.category')} k="category" /></TableCell>
+            <TableCell sx={{ width: 110 }}><SortHeader label={t('table.status')} k="status" /></TableCell>
+            <TableCell sx={{ width: 90, minWidth: 100 }}><SortHeader label={t('table.priority')} k="priority" /></TableCell>
+            <TableCell sx={{ width: 100 }}><SortHeader label={t('table.assignee')} k="assignee" /></TableCell>
+            <TableCell sx={{ width: 110, whiteSpace: 'nowrap' }}><SortHeader label={t('table.dueDate')} k="dueDate" /></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -85,7 +87,7 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
             <TableRow>
               <TableCell colSpan={8} align="center">
                 <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
-                  チケットがありません
+                  {t('table.noTickets')}
                 </Typography>
               </TableCell>
             </TableRow>

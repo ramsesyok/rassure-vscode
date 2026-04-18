@@ -1,0 +1,68 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit"
+  },
+  "status": {
+    "open": "Open",
+    "in_progress": "In Progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "toolbar": {
+    "newTicket": "New Ticket",
+    "refresh": "Refresh",
+    "settings": "Settings"
+  },
+  "table": {
+    "id": "ID",
+    "target": "Target",
+    "description": "Description",
+    "category": "Category",
+    "status": "Status",
+    "priority": "Priority",
+    "assignee": "Assignee",
+    "dueDate": "Due Date",
+    "noTickets": "No tickets"
+  },
+  "form": {
+    "editTicket": "Edit Ticket",
+    "newTicket": "New Ticket",
+    "description": "Description *",
+    "target": "Target",
+    "category": "Category",
+    "noneSelected": "None",
+    "status": "Status",
+    "priority": "Priority",
+    "assignee": "Assignee",
+    "dueDate": "Due Date"
+  },
+  "detail": {
+    "noTarget": "(No target)",
+    "description": "Description",
+    "target": "Target",
+    "category": "Category",
+    "reporter": "Reporter",
+    "assignee": "Assignee",
+    "dueDate": "Due Date",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "comments": "Comments",
+    "commentPlaceholder": "Add a comment... (Ctrl+Enter to send)",
+    "ticketNotFound": "Ticket not found"
+  },
+  "settings": {
+    "title": "Settings",
+    "folderLabel": "Ticket Storage Folder",
+    "folderHelper": "Local folder or Windows network share path (e.g. \\\\server\\share\\tickets)"
+  },
+  "comments": {
+    "noComments": "No comments yet"
+  }
+}

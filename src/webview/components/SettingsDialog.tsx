@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useTranslation } from 'react-i18next';
 import { postRequest } from '../vscodeApi';
 import { Settings } from '../types';
 
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export const SettingsDialog: React.FC<Props> = ({ open, onClose }) => {
+  const { t } = useTranslation();
   const [folderPath, setFolderPath] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -49,15 +51,15 @@ export const SettingsDialog: React.FC<Props> = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>設定</DialogTitle>
+      <DialogTitle>{t('settings.title')}</DialogTitle>
       <DialogContent>
         <TextField
-          label="チケット保存フォルダ"
+          label={t('settings.folderLabel')}
           value={folderPath}
           onChange={e => setFolderPath(e.target.value)}
           fullWidth
           margin="normal"
-          helperText="ローカルフォルダまたはWindowsネットワーク共有パス (例: \\server\share\tickets)"
+          helperText={t('settings.folderHelper')}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -70,14 +72,14 @@ export const SettingsDialog: React.FC<Props> = ({ open, onClose }) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>キャンセル</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSave}
           disabled={!folderPath.trim() || loading}
           startIcon={loading ? <CircularProgress size={16} /> : undefined}
         >
-          保存
+          {t('common.save')}
         </Button>
       </DialogActions>
     </Dialog>

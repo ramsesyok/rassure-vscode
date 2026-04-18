@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { Ticket, Comment, Settings } from './types';
+import { t } from './locale';
 
 export class TicketStorage {
   constructor(private readonly context: vscode.ExtensionContext) {}
@@ -66,7 +67,7 @@ export class TicketStorage {
       canSelectFolders: true,
       canSelectFiles: false,
       canSelectMany: false,
-      title: 'チケット保存フォルダを選択'
+      title: t('selectFolder.dialogTitle')
     });
     if (!result || result.length === 0) {
       return { folderPath: '' };
@@ -81,7 +82,7 @@ export class TicketStorage {
   private getFolderPath(): string {
     const folderPath = this.getSettings().folderPath;
     if (!folderPath) {
-      throw new Error('フォルダが開かれていません。VS Codeでフォルダを開くか、設定からチケット保存フォルダを指定してください。');
+      throw new Error(t('error.noFolder'));
     }
     return folderPath;
   }
@@ -111,7 +112,7 @@ export class TicketStorage {
     const folderPath = this.getFolderPath();
     const filePath = path.join(folderPath, `${id}.json`);
     if (!fs.existsSync(filePath)) {
-      throw new Error(`チケット ${id} が見つかりません`);
+      throw new Error(t('error.ticketNotFound', id));
     }
     const content = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(content) as Ticket;
@@ -199,8 +200,7 @@ export class TicketStorage {
       }
       const catFile = path.join(folderPath, 'categories');
       if (!fs.existsSync(catFile)) {
-        const defaults = ['誤記', '記載不足', '要確認', '修正依頼', '質問'].join('\n');
-        fs.writeFileSync(catFile, defaults, 'utf-8');
+        fs.writeFileSync(catFile, t('categories.default'), 'utf-8');
       }
     } catch {
       // best effort

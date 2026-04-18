@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { BoardPanel } from './BoardPanel';
 import { TicketStorage } from './TicketStorage';
 import { exportToExcel } from './ExportService';
+import { t } from './locale';
 
 let storage: TicketStorage;
 
@@ -9,11 +10,11 @@ async function openBoardWithFolderSelection(context: vscode.ExtensionContext): P
   const currentPath = storage.getSettings().folderPath;
 
   const input = vscode.window.createInputBox();
-  input.title = 'rassure-vscode: 作業フォルダの選択';
-  input.placeholder = 'フォルダのパスを入力、または右のアイコンから選択してください';
+  input.title = t('selectFolder.title');
+  input.placeholder = t('selectFolder.placeholder');
   input.value = currentPath;
   input.buttons = [
-    { iconPath: new vscode.ThemeIcon('folder'), tooltip: 'フォルダを選択' }
+    { iconPath: new vscode.ThemeIcon('folder'), tooltip: t('selectFolder.tooltip') }
   ];
 
   let selectingFolder = false;
@@ -25,7 +26,7 @@ async function openBoardWithFolderSelection(context: vscode.ExtensionContext): P
       canSelectFiles: false,
       canSelectFolders: true,
       canSelectMany: false,
-      title: 'チケット保存フォルダを選択'
+      title: t('selectFolder.dialogTitle')
     });
     selectingFolder = false;
     if (result && result.length > 0) {

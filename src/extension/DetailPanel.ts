@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { TicketStorage } from './TicketStorage';
 import { BoardPanel } from './BoardPanel';
 import { WebviewRequest } from './types';
+import { getLocale } from './locale';
 
 function getNonce(): string {
   let text = '';
@@ -91,6 +92,7 @@ export class DetailPanel {
     );
     const nonce = getNonce();
     const currentUser = this._storage.getCurrentUser();
+    const lang = getLocale();
 
     const csp = [
       `default-src 'none'`,
@@ -102,12 +104,13 @@ export class DetailPanel {
     ].join('; ');
 
     return `<!DOCTYPE html>
-<html lang="ja">
+<html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="rassure-user" content="${currentUser}">
+  <meta name="rassure-lang" content="${lang}">
   <meta name="rassure-ticket-id" content="${this._ticketId}">
   <link rel="stylesheet" href="${styleUri}">
   <title>Rassure — ${this._ticketId}</title>

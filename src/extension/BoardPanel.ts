@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { TicketStorage } from './TicketStorage';
 import { WebviewRequest } from './types';
+import { t, getLocale } from './locale';
 
 /** VS Code公式サンプルと同じ英数字ノンス生成（hex/base64不可） */
 function getNonce(): string {
@@ -30,7 +31,7 @@ export class BoardPanel {
     }
     const panel = vscode.window.createWebviewPanel(
       'rassureBoard',
-      'Rassure — ボード',
+      t('board.title'),
       vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -93,6 +94,7 @@ export class BoardPanel {
     );
     const nonce = getNonce();
     const currentUser = this._storage.getCurrentUser();
+    const lang = getLocale();
 
     // CSP は必ず1行で記述（改行があるとVS CodeのWebviewパーサーが誤解析する）
     const csp = [
@@ -105,12 +107,13 @@ export class BoardPanel {
     ].join('; ');
 
     return `<!DOCTYPE html>
-<html lang="ja">
+<html lang="${lang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="rassure-user" content="${currentUser}">
+  <meta name="rassure-lang" content="${lang}">
   <link rel="stylesheet" href="${styleUri}">
   <title>Rassure</title>
 </head>

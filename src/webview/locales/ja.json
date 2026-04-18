@@ -1,0 +1,68 @@
+{
+  "common": {
+    "cancel": "キャンセル",
+    "save": "保存",
+    "edit": "編集"
+  },
+  "status": {
+    "open": "未着手",
+    "in_progress": "対応中",
+    "resolved": "解決済",
+    "closed": "クローズ"
+  },
+  "priority": {
+    "high": "高",
+    "medium": "中",
+    "low": "低"
+  },
+  "toolbar": {
+    "newTicket": "新規チケット",
+    "refresh": "更新",
+    "settings": "設定"
+  },
+  "table": {
+    "id": "ID",
+    "target": "指摘対象",
+    "description": "説明",
+    "category": "指摘種別",
+    "status": "状況",
+    "priority": "重要度",
+    "assignee": "担当者",
+    "dueDate": "期限",
+    "noTickets": "チケットがありません"
+  },
+  "form": {
+    "editTicket": "チケット編集",
+    "newTicket": "新規チケット",
+    "description": "説明 *",
+    "target": "指摘対象",
+    "category": "指摘種別",
+    "noneSelected": "未選択",
+    "status": "状況",
+    "priority": "重要度",
+    "assignee": "担当者",
+    "dueDate": "期限"
+  },
+  "detail": {
+    "noTarget": "（指摘対象なし）",
+    "description": "説明",
+    "target": "指摘対象",
+    "category": "指摘種別",
+    "reporter": "指摘者",
+    "assignee": "担当者",
+    "dueDate": "期限",
+    "createdAt": "作成日",
+    "updatedAt": "更新日",
+    "comments": "コメント",
+    "commentPlaceholder": "コメントを追加... (Ctrl+Enter で送信)",
+    "ticketNotFound": "チケットが見つかりません"
+  },
+  "settings": {
+    "title": "設定",
+    "folderLabel": "チケット保存フォルダ",
+    "folderHelper": "ローカルフォルダまたはWindowsネットワーク共有パス (例: \\\\server\\share\\tickets)"
+  },
+  "comments": {
+    "noComments": "コメントはありません"
+  }
+}
