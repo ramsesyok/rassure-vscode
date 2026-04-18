@@ -1,5 +1,6 @@
 {
   "name": "rassure-vscode",
+  "publisher": "ramsesyok",
   "displayName": "Rassure",
   "description": "ローカル駆動・データベースレスの課題管理用VS Code拡張",
   "version": "0.3.0",
