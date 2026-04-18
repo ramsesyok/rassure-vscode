@@ -57,8 +57,17 @@ async function openBoardWithFolderSelection(context: vscode.ExtensionContext): P
   input.show();
 }
 
+function initializeDefaultSettings(): void {
+  const config = vscode.workspace.getConfiguration('rassure-vscode');
+  const inspect = config.inspect('exportColumnOrder');
+  if (!inspect?.globalValue && !inspect?.workspaceValue) {
+    config.update('exportColumnOrder', inspect?.defaultValue, vscode.ConfigurationTarget.Global);
+  }
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   storage = new TicketStorage(context);
+  initializeDefaultSettings();
 
   context.subscriptions.push(
     vscode.commands.registerCommand('rassure-vscode.openBoard', () => {
