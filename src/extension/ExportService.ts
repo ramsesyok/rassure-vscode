@@ -32,36 +32,34 @@ function formatComments(comments: { timestamp: string; author: string; body: str
   }).join('\n');
 }
 
-// Japanese column key → column metadata (width, wrap flag)
 const COLUMN_META: Record<string, { width: number; wrap?: boolean }> = {
-  'ID':       { width: 10 },
-  '状況':     { width: 12 },
-  '重要度':   { width: 10 },
-  '指摘対象': { width: 20 },
-  '指摘種別': { width: 16 },
-  '説明':     { width: 50, wrap: true },
-  'コメント': { width: 50, wrap: true },
-  '指摘者':   { width: 14 },
-  '担当者':   { width: 14 },
-  '期限':     { width: 14 },
-  '作成日':   { width: 20 },
-  '更新日':   { width: 20 },
+  'ID':          { width: 10 },
+  'status':      { width: 12 },
+  'priority':    { width: 10 },
+  'target':      { width: 20 },
+  'category':    { width: 16 },
+  'description': { width: 50, wrap: true },
+  'comments':    { width: 50, wrap: true },
+  'reporter':    { width: 14 },
+  'assignee':    { width: 14 },
+  'dueDate':     { width: 14 },
+  'createdAt':   { width: 20 },
+  'updatedAt':   { width: 20 },
 };
 
-// Japanese column key → NLS key for localized header label
 const COLUMN_NLS: Record<string, Parameters<typeof t>[0]> = {
-  'ID':       'col.id',
-  '状況':     'col.status',
-  '重要度':   'col.priority',
-  '指摘対象': 'col.target',
-  '指摘種別': 'col.category',
-  '説明':     'col.description',
-  'コメント': 'col.comments',
-  '指摘者':   'col.reporter',
-  '担当者':   'col.assignee',
-  '期限':     'col.dueDate',
-  '作成日':   'col.createdAt',
-  '更新日':   'col.updatedAt',
+  'ID':          'col.id',
+  'status':      'col.status',
+  'priority':    'col.priority',
+  'target':      'col.target',
+  'category':    'col.category',
+  'description': 'col.description',
+  'comments':    'col.comments',
+  'reporter':    'col.reporter',
+  'assignee':    'col.assignee',
+  'dueDate':     'col.dueDate',
+  'createdAt':   'col.createdAt',
+  'updatedAt':   'col.updatedAt',
 };
 
 export async function exportToExcel(storage: TicketStorage): Promise<void> {
@@ -95,18 +93,18 @@ export async function exportToExcel(storage: TicketStorage): Promise<void> {
     }));
 
     const ticketValueMap = (ticket: ReturnType<typeof storage.getTicketList>[number]): Record<string, ExcelJS.CellValue> => ({
-      'ID':       ticket.id,
-      '状況':     getStatusLabel(ticket.status),
-      '重要度':   getPriorityLabel(ticket.priority),
-      '指摘対象': ticket.target,
-      '指摘種別': ticket.category,
-      '説明':     ticket.description,
-      'コメント': formatComments(ticket.comments ?? []),
-      '指摘者':   ticket.reporter,
-      '担当者':   ticket.assignee,
-      '期限':     ticket.dueDate,
-      '作成日':   ticket.createdAt ? new Date(ticket.createdAt).toLocaleString(locale === 'ja' ? 'ja-JP' : 'en-US') : '',
-      '更新日':   ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString(locale === 'ja' ? 'ja-JP' : 'en-US') : '',
+      'ID':          ticket.id,
+      'status':      getStatusLabel(ticket.status),
+      'priority':    getPriorityLabel(ticket.priority),
+      'target':      ticket.target,
+      'category':    ticket.category,
+      'description': ticket.description,
+      'comments':    formatComments(ticket.comments ?? []),
+      'reporter':    ticket.reporter,
+      'assignee':    ticket.assignee,
+      'dueDate':     ticket.dueDate,
+      'createdAt':   ticket.createdAt ? new Date(ticket.createdAt).toLocaleString(locale === 'ja' ? 'ja-JP' : 'en-US') : '',
+      'updatedAt':   ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleString(locale === 'ja' ? 'ja-JP' : 'en-US') : '',
     });
 
     const workbook = new ExcelJS.Workbook();

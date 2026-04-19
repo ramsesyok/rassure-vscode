@@ -207,7 +207,7 @@ export class TicketStorage {
     }
   }
 
-  static readonly DEFAULT_EXPORT_COLUMN_ORDER = ['ID','状況','重要度','指摘対象','指摘種別','説明','コメント','指摘者','担当者','期限','作成日','更新日'];
+  static readonly DEFAULT_EXPORT_COLUMN_ORDER = ['ID','status','priority','target','category','description','comments','reporter','assignee','dueDate','createdAt','updatedAt'];
 
   getTargetSuggestions(): string[] {
     try {

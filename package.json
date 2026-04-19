@@ -50,17 +50,17 @@
           },
           "default": [
             "ID",
-            "状況",
-            "重要度",
-            "指摘対象",
-            "指摘種別",
-            "説明",
-            "コメント",
-            "指摘者",
-            "担当者",
-            "期限",
-            "作成日",
-            "更新日"
+            "status",
+            "priority",
+            "target",
+            "category",
+            "description",
+            "comments",
+            "reporter",
+            "assignee",
+            "dueDate",
+            "createdAt",
+            "updatedAt"
           ],
           "description": "%config.exportColumnOrder.description%"
         }
