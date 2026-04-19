@@ -4,6 +4,7 @@
   "displayName": "Rassure",
   "description": "%extension.description%",
   "version": "0.3.0",
+  "icon": "docs/images/icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
