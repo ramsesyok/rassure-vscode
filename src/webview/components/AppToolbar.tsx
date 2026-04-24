@@ -7,6 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import FormControl from '@mui/material/FormControl';
+import InputBase from '@mui/material/InputBase';
 import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -15,6 +16,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import PersonIcon from '@mui/icons-material/Person';
+import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 import { Ticket } from '../types';
 
@@ -26,6 +28,8 @@ interface Props {
   availableStatuses: Ticket['status'][];
   selectedStatuses: Ticket['status'][];
   onStatusFilterChange: (statuses: Ticket['status'][]) => void;
+  searchKeyword: string;
+  onSearchChange: (keyword: string) => void;
 }
 
 export const AppToolbar: React.FC<Props> = ({
@@ -36,12 +40,22 @@ export const AppToolbar: React.FC<Props> = ({
   availableStatuses,
   selectedStatuses,
   onStatusFilterChange,
+  searchKeyword,
+  onSearchChange,
 }) => {
   const { t } = useTranslation();
 
-  const handleChange = (event: SelectChangeEvent<Ticket['status'][]>) => {
+  const handleStatusChange = (event: SelectChangeEvent<Ticket['status'][]>) => {
     const val = event.target.value;
     onStatusFilterChange(typeof val === 'string' ? [val as Ticket['status']] : val);
+  };
+
+  const inputSx = {
+    color: 'inherit',
+    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+    '& .MuiSelect-icon': { color: 'inherit' },
   };
 
   return (
@@ -54,23 +68,33 @@ export const AppToolbar: React.FC<Props> = ({
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <FormControl size="small" sx={{ minWidth: 180, mr: 2 }}>
+        {/* キーワード検索 */}
+        <Box sx={{ display: 'flex', alignItems: 'center', mr: 1, opacity: 0.8 }}>
+          <SearchIcon fontSize="small" sx={{ mr: 0.5 }} />
+          <InputBase
+            type="search"
+            value={searchKeyword}
+            onChange={e => onSearchChange(e.target.value)}
+            placeholder={t('toolbar.searchPlaceholder')}
+            size="small"
+            sx={{
+              color: 'inherit',
+              fontSize: 13,
+              width: 160,
+              '& input::placeholder': { color: 'inherit', opacity: 0.6 },
+              '& input::-webkit-search-cancel-button': { cursor: 'pointer' },
+            }}
+          />
+        </Box>
+
+        {/* ステータスフィルタ */}
+        <FormControl size="small" sx={{ minWidth: 160, mr: 2 }}>
           <Select
             multiple
             displayEmpty
             value={selectedStatuses}
-            onChange={handleChange}
-            input={
-              <OutlinedInput
-                sx={{
-                  color: 'inherit',
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
-                  '& .MuiSelect-icon': { color: 'inherit' },
-                }}
-              />
-            }
+            onChange={handleStatusChange}
+            input={<OutlinedInput sx={inputSx} />}
             renderValue={selected => (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {selected.map(s => (

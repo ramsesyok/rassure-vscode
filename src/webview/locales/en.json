@@ -18,7 +18,8 @@
   "toolbar": {
     "newTicket": "New Ticket",
     "refresh": "Refresh",
-    "settings": "Settings"
+    "settings": "Settings",
+    "searchPlaceholder": "Search by keyword..."
   },
   "table": {
     "id": "ID",

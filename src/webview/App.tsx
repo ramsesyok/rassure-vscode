@@ -22,13 +22,19 @@ export const App: React.FC = () => {
   const [selectedStatuses, setSelectedStatuses] = useState<Ticket['status'][]>(() =>
     hideClosedDefault ? ALL_STATUSES.filter(s => s !== 'closed') : [...ALL_STATUSES]
   );
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const availableStatuses = useMemo(() => {
     const set = new Set(tickets.map(t => t.status));
     return ALL_STATUSES.filter(s => set.has(s));
   }, [tickets]);
 
-  const filteredTickets = tickets.filter(t => selectedStatuses.includes(t.status));
+  const filteredTickets = tickets.filter(t => {
+    if (!selectedStatuses.includes(t.status)) return false;
+    if (!searchKeyword) return true;
+    const kw = searchKeyword.toLowerCase();
+    return t.id.toLowerCase().includes(kw) || t.description.toLowerCase().includes(kw);
+  });
 
   const handleSelectTicket = (id: string) => {
     postRequest('openDetail', { id }).catch(() => {});
@@ -44,6 +50,8 @@ export const App: React.FC = () => {
         availableStatuses={availableStatuses}
         selectedStatuses={selectedStatuses}
         onStatusFilterChange={setSelectedStatuses}
+        searchKeyword={searchKeyword}
+        onSearchChange={setSearchKeyword}
       />
       <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <TicketTable

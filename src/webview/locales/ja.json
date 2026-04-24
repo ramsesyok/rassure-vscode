@@ -18,7 +18,8 @@
   "toolbar": {
     "newTicket": "新規チケット",
     "refresh": "更新",
-    "settings": "設定"
+    "settings": "設定",
+    "searchPlaceholder": "キーワードで検索..."
   },
   "table": {
     "id": "ID",
