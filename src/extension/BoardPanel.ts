@@ -95,6 +95,9 @@ export class BoardPanel {
     const nonce = getNonce();
     const currentUser = this._storage.getCurrentUser();
     const lang = getLocale();
+    const hideClosed = vscode.workspace
+      .getConfiguration('rassure-vscode')
+      .get<boolean>('hideClosedTickets', false);
 
     // CSP は必ず1行で記述（改行があるとVS CodeのWebviewパーサーが誤解析する）
     const csp = [
@@ -114,6 +117,7 @@ export class BoardPanel {
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="rassure-user" content="${currentUser}">
   <meta name="rassure-lang" content="${lang}">
+  <meta name="rassure-hide-closed" content="${hideClosed}">
   <link rel="stylesheet" href="${styleUri}">
   <title>Rassure</title>
 </head>
