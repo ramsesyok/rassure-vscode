@@ -64,5 +64,8 @@
   },
   "comments": {
     "noComments": "No comments yet"
+  },
+  "filter": {
+    "statusLabel": "Status Filter"
   }
 }

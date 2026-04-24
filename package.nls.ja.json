@@ -4,5 +4,6 @@
   "command.exportToExcel": "Rassure: Excel にエクスポート",
   "config.username.description": "チケットに記録するユーザー名（未設定時はOSのユーザー名を使用します）",
   "config.idPrefix.description": "チケットIDおよびファイル名の先頭に付与するプレフィックスを指定します。OSのファイル名禁止文字（\\ / : * ? \" < > |）は使用できません。",
-  "config.exportColumnOrder.description": "Excelエクスポート時のカラムの並び順を指定します。出力したい項目を上から順に並べてください。"
+  "config.exportColumnOrder.description": "Excelエクスポート時のカラムの並び順を指定します。出力したい項目を上から順に並べてください。",
+  "config.hideClosedTickets.description": "拡張機能の起動時に、ステータスが 'Closed' のチケットを一覧から除外します。"
 }

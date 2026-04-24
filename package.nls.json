@@ -4,5 +4,6 @@
   "command.exportToExcel": "Rassure: Export to Excel",
   "config.username.description": "Username recorded on tickets. Defaults to the OS username if not set.",
   "config.idPrefix.description": "Prefix for ticket IDs and filenames. OS-reserved characters (\\ / : * ? \" < > |) are not allowed.",
-  "config.exportColumnOrder.description": "Column order for Excel export. List the columns you want from top to bottom."
+  "config.exportColumnOrder.description": "Column order for Excel export. List the columns you want from top to bottom.",
+  "config.hideClosedTickets.description": "When the extension starts, exclude tickets with status 'Closed' from the board."
 }
