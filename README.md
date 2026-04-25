@@ -229,9 +229,8 @@ Category dropdown options are configured via a `rassure.json` file (JSON with Co
 
 If the file does not exist, it is created automatically when the board opens with these defaults:
 
-```jsonc
+```json
 {
-  // rassure configuration
   "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"]
 }
 ```

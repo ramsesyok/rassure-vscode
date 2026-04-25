@@ -228,9 +228,8 @@ Rassure: Excel にエクスポート
 
 ファイルが存在しない場合は、ボードを開いた際に以下の内容で自動生成されます。
 
-```jsonc
+```json
 {
-  // rassure configuration
   "categories": ["誤記", "記載不足", "要確認", "修正依頼", "質問"]
 }
 ```

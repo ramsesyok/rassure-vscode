@@ -207,9 +207,8 @@ Category dropdown options are configured via a `rassure.json` file (JSON with Co
 
 If the file does not exist, it is auto-generated when the board opens with the following defaults:
 
-```jsonc
+```json
 {
-  // rassure configuration
   "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"]
 }
 ```
@@ -528,9 +527,8 @@ Rassure: Excel にエクスポート
 
 ファイルが存在しない場合は、ボードを開いた際に以下の内容で自動生成されます。
 
-```jsonc
+```json
 {
-  // rassure configuration
   "categories": ["誤記", "記載不足", "要確認", "修正依頼", "質問"]
 }
 ```

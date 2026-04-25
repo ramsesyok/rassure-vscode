@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { Ticket, Comment, Settings } from './types';
 import { t } from './locale';
-import { parse as parseJsonc } from 'jsonc-parser';
+
 
 export class TicketStorage {
   constructor(private readonly context: vscode.ExtensionContext) {}
@@ -181,9 +181,9 @@ export class TicketStorage {
       const configFile = path.join(folderPath, 'rassure.json');
       if (fs.existsSync(configFile)) {
         const content = fs.readFileSync(configFile, 'utf-8');
-        const config = parseJsonc(content) as { categories?: string[] };
+        const config = JSON.parse(content) as { categories?: unknown[] };
         if (Array.isArray(config?.categories)) {
-          return config.categories.filter((c: string) => typeof c === 'string' && c.trim().length > 0);
+          return (config.categories as unknown[]).filter((c): c is string => typeof c === 'string' && c.trim().length > 0);
         }
       }
     } catch {
@@ -230,8 +230,7 @@ export class TicketStorage {
   }
 
   private buildRassureJson(categories: string[]): string {
-    const items = categories.map(c => JSON.stringify(c)).join(', ');
-    return `{\n  // rassure configuration\n  "categories": [${items}]\n}\n`;
+    return JSON.stringify({ categories }, null, 2) + '\n';
   }
 
   static readonly DEFAULT_EXPORT_COLUMN_ORDER = ['ID','status','priority','target','category','description','comments','reporter','assignee','dueDate','createdAt','updatedAt'];
