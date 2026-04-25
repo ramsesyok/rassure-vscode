@@ -22,5 +22,6 @@ export interface Ticket {
 
 export interface Settings {
   folderPath: string;
+  targetRoot?: string;
 }
 

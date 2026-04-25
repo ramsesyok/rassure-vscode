@@ -24,5 +24,7 @@
   "col.createdAt": "Created At",
   "col.updatedAt": "Updated At",
   "worksheet.name": "Issues",
-  "categories.default": "Typo\nMissing Info\nNeeds Review\nChange Request\nQuestion"
+  "categories.default": "Typo\nMissing Info\nNeeds Review\nChange Request\nQuestion",
+  "error.openFile.noBasePath": "Cannot open file: no workspace folder or targetRoot is configured in rassure.json.",
+  "error.openFile.notFound": "File not found. Searched: {0}"
 }

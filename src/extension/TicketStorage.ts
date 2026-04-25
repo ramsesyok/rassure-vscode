@@ -23,6 +23,7 @@ export class TicketStorage {
       case 'saveTicket':       return this.saveTicket(payload as Partial<Ticket>);
       case 'addComment':       return this.addComment((payload as { id: string; body: string }).id, (payload as { id: string; body: string }).body);
       case 'getCategories':    return this.getCategories();
+      case 'openTargetFile':   return this.openTargetFile((payload as { text: string }).text);
       case 'getTargetSuggestions': return this.getTargetSuggestions();
       case 'getAssigneeSuggestions': return this.getAssigneeSuggestions();
       default:
@@ -55,11 +56,38 @@ export class TicketStorage {
   getSettings(): Settings {
     const saved = this.context.globalState.get<string>('rassure.folderPath', '');
     const folderPath = saved || this.getWorkspaceFolderPath();
-    return { folderPath };
+    let targetRoot: string | undefined;
+    if (folderPath) {
+      try {
+        const configFile = path.join(folderPath, 'rassure.json');
+        if (fs.existsSync(configFile)) {
+          const config = JSON.parse(fs.readFileSync(configFile, 'utf-8')) as { targetRoot?: string };
+          targetRoot = config.targetRoot || undefined;
+        }
+      } catch { /* ignore */ }
+    }
+    return { folderPath, targetRoot };
   }
 
   async saveSettings(settings: Settings): Promise<Settings> {
     await this.context.globalState.update('rassure.folderPath', settings.folderPath);
+    if (settings.folderPath) {
+      try {
+        if (!fs.existsSync(settings.folderPath)) {
+          fs.mkdirSync(settings.folderPath, { recursive: true });
+        }
+        const configFile = path.join(settings.folderPath, 'rassure.json');
+        let existing: Record<string, unknown> = {};
+        if (fs.existsSync(configFile)) {
+          try { existing = JSON.parse(fs.readFileSync(configFile, 'utf-8')); } catch { /* ignore */ }
+        }
+        if (settings.targetRoot !== undefined) {
+          existing.targetRoot = settings.targetRoot || undefined;
+          if (!existing.targetRoot) { delete existing.targetRoot; }
+        }
+        fs.writeFileSync(configFile, JSON.stringify(existing, null, 2) + '\n', 'utf-8');
+      } catch { /* best effort */ }
+    }
     return settings;
   }
 
@@ -212,6 +240,55 @@ export class TicketStorage {
     }
   }
 
+  async openTargetFile(text: string): Promise<void> {
+    if (!text?.trim()) { return; }
+
+    // パス解析: "src/main.ts:15" / "src/main.ts 行15" / "src/main.ts L15"
+    const m = text.trim().match(/^(.+?)(?::(\d+)|[\s　]+(?:行|L)(\d+))?\s*$/);
+    if (!m) { return; }
+    const rawPath = m[1].trim();
+    const lineNum = m[2] !== undefined ? parseInt(m[2], 10) - 1
+                  : m[3] !== undefined ? parseInt(m[3], 10) - 1
+                  : undefined;
+
+    // ベースパスの決定
+    let basePath: string | undefined;
+    const folderPath = this.getSettings().folderPath;
+    if (folderPath) {
+      try {
+        const configFile = path.join(folderPath, 'rassure.json');
+        if (fs.existsSync(configFile)) {
+          const config = JSON.parse(fs.readFileSync(configFile, 'utf-8')) as { targetRoot?: string };
+          if (config.targetRoot) {
+            basePath = path.isAbsolute(config.targetRoot)
+              ? config.targetRoot
+              : path.join(folderPath, config.targetRoot);
+          }
+        }
+      } catch { /* ignore */ }
+    }
+    if (!basePath) {
+      basePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    }
+    if (!basePath) {
+      vscode.window.showErrorMessage(t('error.openFile.noBasePath'));
+      return;
+    }
+
+    const absPath = path.isAbsolute(rawPath) ? rawPath : path.join(basePath, rawPath);
+
+    if (!fs.existsSync(absPath)) {
+      vscode.window.showWarningMessage(t('error.openFile.notFound', absPath));
+      return;
+    }
+
+    const doc = await vscode.workspace.openTextDocument(absPath);
+    const editor = await vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside });
+    if (lineNum !== undefined && lineNum >= 0) {
+      const pos = new vscode.Position(lineNum, 0);
+      editor.selection = new vscode.Selection(pos, pos);
+      editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
+    }
   migrateCategoriesIfNeeded(): void {
     try {
       const folderPath = this.getSettings().folderPath;

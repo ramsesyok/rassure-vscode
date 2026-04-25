@@ -6,10 +6,13 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
+import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import EditIcon from '@mui/icons-material/Edit';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import SendIcon from '@mui/icons-material/Send';
 import { useTranslation } from 'react-i18next';
 import { Ticket } from '../types';
@@ -18,7 +21,7 @@ import { PriorityChip } from './PriorityChip';
 import { DueDateLabel } from './DueDateLabel';
 import { CommentList } from './CommentList';
 import { TicketForm } from './TicketForm';
-import { postRequest } from '../vscodeApi';
+import { postRequest, postNotification } from '../vscodeApi';
 import dayjs from 'dayjs';
 
 interface Props {
@@ -91,7 +94,18 @@ export const TicketDetail: React.FC<Props> = ({ ticket, currentUser, onUpdated }
         <Card variant="outlined">
           <CardContent>
             <Grid container spacing={1}>
-              <Grid item xs={4}>{metaCell(t('detail.target'), <Typography variant="body2">{ticket.target || '—'}</Typography>)}</Grid>
+              <Grid item xs={4}>{metaCell(t('detail.target'),
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography variant="body2">{ticket.target || '—'}</Typography>
+                  {ticket.target && (
+                    <Tooltip title={t('detail.openTargetFile')}>
+                      <IconButton size="small" onClick={() => postNotification('openTargetFile', { text: ticket.target })}>
+                        <OpenInNewIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+              )}</Grid>
               <Grid item xs={4}>{metaCell(t('detail.category'), <Typography variant="body2">{ticket.category || '—'}</Typography>)}</Grid>
               <Grid item xs={4}>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 2 }}>

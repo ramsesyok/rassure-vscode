@@ -24,5 +24,7 @@
   "col.createdAt": "作成日",
   "col.updatedAt": "更新日",
   "worksheet.name": "課題一覧",
-  "categories.default": "誤記\n記載不足\n要確認\n修正依頼\n質問"
+  "categories.default": "誤記\n記載不足\n要確認\n修正依頼\n質問",
+  "error.openFile.noBasePath": "ファイルを開けません: ワークスペースまたは rassure.json の targetRoot が設定されていません。",
+  "error.openFile.notFound": "ファイルが見つかりません。探索先: {0}"
 }

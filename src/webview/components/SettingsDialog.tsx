@@ -21,11 +21,15 @@ interface Props {
 export const SettingsDialog: React.FC<Props> = ({ open, onClose }) => {
   const { t } = useTranslation();
   const [folderPath, setFolderPath] = useState('');
+  const [targetRoot, setTargetRoot] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
-      postRequest<Settings>('getSettings').then(s => setFolderPath(s.folderPath ?? '')).catch(() => {});
+      postRequest<Settings>('getSettings').then(s => {
+        setFolderPath(s.folderPath ?? '');
+        setTargetRoot(s.targetRoot ?? '');
+      }).catch(() => {});
     }
   }, [open]);
 
@@ -38,11 +42,20 @@ export const SettingsDialog: React.FC<Props> = ({ open, onClose }) => {
     }
   };
 
+  const handleSelectTargetRoot = async () => {
+    try {
+      const result = await postRequest<{ folderPath: string }>('selectFolder');
+      if (result.folderPath) setTargetRoot(result.folderPath);
+    } catch {
+      // user cancelled
+    }
+  };
+
   const handleSave = async () => {
     if (!folderPath.trim()) return;
     setLoading(true);
     try {
-      await postRequest('saveSettings', { folderPath: folderPath.trim() });
+      await postRequest('saveSettings', { folderPath: folderPath.trim(), targetRoot: targetRoot.trim() });
       onClose();
     } finally {
       setLoading(false);
@@ -60,14 +73,35 @@ export const SettingsDialog: React.FC<Props> = ({ open, onClose }) => {
           fullWidth
           margin="normal"
           helperText={t('settings.folderHelper')}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleSelectFolder} edge="end">
-                  <FolderOpenIcon />
-                </IconButton>
-              </InputAdornment>
-            )
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleSelectFolder} edge="end">
+                    <FolderOpenIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }
+          }}
+        />
+        <TextField
+          label={t('settings.targetRootLabel')}
+          value={targetRoot}
+          onChange={e => setTargetRoot(e.target.value)}
+          fullWidth
+          margin="normal"
+          helperText={t('settings.targetRootHelper')}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleSelectTargetRoot} edge="end">
+                    <FolderOpenIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }
           }}
         />
       </DialogContent>

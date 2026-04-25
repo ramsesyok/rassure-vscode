@@ -56,12 +56,15 @@
     "updatedAt": "更新日",
     "comments": "コメント",
     "commentPlaceholder": "コメントを追加... (Ctrl+Enter で送信)",
-    "ticketNotFound": "チケットが見つかりません"
+    "ticketNotFound": "チケットが見つかりません",
+    "openTargetFile": "ファイルを開く"
   },
   "settings": {
     "title": "設定",
     "folderLabel": "チケット保存フォルダ",
-    "folderHelper": "ローカルフォルダまたはWindowsネットワーク共有パス (例: \\\\server\\share\\tickets)"
+    "folderHelper": "ローカルフォルダまたはWindowsネットワーク共有パス (例: \\\\server\\share\\tickets)",
+    "targetRootLabel": "指摘対象のルートパス (targetRoot)",
+    "targetRootHelper": "「指摘対象」フィールドの相対パスを解決する起点フォルダ。空欄の場合はワークスペースフォルダを使用します。"
   },
   "comments": {
     "noComments": "コメントはありません"
