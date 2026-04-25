@@ -75,7 +75,7 @@
   "scripts": {
     "vscode:prepublish": "npm run build",
     "compile": "tsc -p tsconfig.json --noEmit",
-    "build:extension": "esbuild src/extension/extension.ts --bundle --outfile=out/extension.js --external:vscode --platform=node --format=cjs",
+    "build:extension": "esbuild src/extension/extension.ts --bundle --outfile=out/extension.js --external:vscode --platform=node --format=cjs --define:navigator=undefined",
     "build": "npm run build:extension && npm run build:webview",
     "build:webview": "vite build",
     "watch": "esbuild src/extension/extension.ts --bundle --outfile=out/extension.js --external:vscode --platform=node --format=cjs --watch",

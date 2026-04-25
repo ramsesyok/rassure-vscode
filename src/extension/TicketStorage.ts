@@ -289,6 +289,8 @@ export class TicketStorage {
       editor.selection = new vscode.Selection(pos, pos);
       editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
     }
+  }
+
   migrateCategoriesIfNeeded(): void {
     try {
       const folderPath = this.getSettings().folderPath;
