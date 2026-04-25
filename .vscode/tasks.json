@@ -16,8 +16,15 @@
       "problemMatcher": []
     },
     {
+      "label": "build:extension",
+      "type": "npm",
+      "script": "build:extension",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
       "label": "build",
-      "dependsOn": ["compile", "build:webview"],
+      "dependsOn": ["compile", "build:extension", "build:webview"],
       "dependsOrder": "sequence",
       "group": {
         "kind": "build",

@@ -43,6 +43,7 @@ async function openBoardWithFolderSelection(context: vscode.ExtensionContext): P
       return;
     }
     await storage.saveSettings({ folderPath });
+    storage.migrateCategoriesIfNeeded();
     storage.ensureDefaultFiles();
     BoardPanel.createOrShow(context, storage);
   });
