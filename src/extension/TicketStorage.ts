@@ -71,7 +71,10 @@ export class TicketStorage {
 
   async saveSettings(settings: Settings): Promise<Settings> {
     await this.context.globalState.update('rassure.folderPath', settings.folderPath);
-    if (settings.folderPath) {
+    // Only touch rassure.json when targetRoot is explicitly provided (i.e. called from the settings dialog).
+    // Omitting targetRoot (undefined) means "don't change rassure.json" — this prevents overwriting the
+    // file with {} when saveSettings is called with only folderPath during board initialisation.
+    if (settings.folderPath && settings.targetRoot !== undefined) {
       try {
         if (!fs.existsSync(settings.folderPath)) {
           fs.mkdirSync(settings.folderPath, { recursive: true });
@@ -81,10 +84,8 @@ export class TicketStorage {
         if (fs.existsSync(configFile)) {
           try { existing = JSON.parse(fs.readFileSync(configFile, 'utf-8')); } catch { /* ignore */ }
         }
-        if (settings.targetRoot !== undefined) {
-          existing.targetRoot = settings.targetRoot || undefined;
-          if (!existing.targetRoot) { delete existing.targetRoot; }
-        }
+        existing.targetRoot = settings.targetRoot.trim() || undefined;
+        if (!existing.targetRoot) { delete existing.targetRoot; }
         fs.writeFileSync(configFile, JSON.stringify(existing, null, 2) + '\n', 'utf-8');
       } catch { /* best effort */ }
     }
@@ -303,6 +304,7 @@ export class TicketStorage {
         .map((line: string) => line.trim())
         .filter((line: string) => line.length > 0);
       fs.writeFileSync(configFile, this.buildRassureJson(categories), 'utf-8');
+      fs.unlinkSync(oldFile);
     } catch {
       // best effort
     }
