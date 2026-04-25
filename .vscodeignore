@@ -1,11 +1,16 @@
 .vscode/**
+.claude/**
 src/**
 node_modules/**
+scripts/**
+docs/tickets/**
+CLAUDE.md
 tsconfig.json
 tsconfig.webview.json
 vite.config.ts
 .gitignore
 **/*.map
 **/*.ts
+out/**
 !out/extension.js
 !dist/**
