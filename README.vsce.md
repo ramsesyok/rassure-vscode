@@ -17,14 +17,16 @@ No database or server setup required. Works in closed-network environments.
 1. [Installation](#installation)
 2. [Getting Started — Storage Folder Setup](#getting-started--storage-folder-setup)
 3. [Board View](#board-view)
-4. [Creating a Ticket](#creating-a-ticket)
-5. [Ticket Detail / Edit](#ticket-detail--edit)
-6. [Adding Comments](#adding-comments)
-7. [Excel Export](#excel-export)
-8. [Settings Customization](#settings-customization)
-9. [Category Customization](#category-customization)
-10. [Ticket Data Format (Reference)](#ticket-data-format-reference)
-11. [Development / Build](#development--build)
+4. [Filtering & Search](#filtering--search)
+5. [Creating a Ticket](#creating-a-ticket)
+6. [Ticket Detail / Edit](#ticket-detail--edit)
+7. [Smart Jump](#smart-jump)
+8. [Adding Comments](#adding-comments)
+9. [Excel Export](#excel-export)
+10. [Settings Customization](#settings-customization)
+11. [Category Customization](#category-customization)
+12. [Ticket Data Format (Reference)](#ticket-data-format-reference)
+13. [Development / Build](#development--build)
 
 ---
 
@@ -91,6 +93,30 @@ Displays all tickets in the storage folder as a list.
 
 ---
 
+## Filtering & Search
+
+The board toolbar provides two ways to narrow down tickets.
+
+### Status Filter
+
+Use the **Status** dropdown to show only tickets with a specific status.
+
+| Selection | Result |
+|-----------|--------|
+| (All) | All tickets |
+| Open | Open tickets only |
+| In Progress | In Progress tickets only |
+| Resolved | Resolved tickets only |
+| Closed | Closed tickets only |
+
+### Keyword Search
+
+Type in the **search box** to filter tickets in real time across **ID, Target, Category, and Description** (case-insensitive).
+
+Both filters can be combined.
+
+---
+
 ## Creating a Ticket
 
 Click the **New** button in the top-right of the board to open the ticket creation form in a new tab.
@@ -118,6 +144,30 @@ Ticket IDs (e.g. `#001`) are assigned automatically.
 Click a row on the board to open the detail view in a new tab.
 
 Click **Edit** to make fields editable. Click **Save** to persist changes, or **Cancel** to revert.
+
+---
+
+## Smart Jump
+
+When the **Target** field contains a value, a small **Open File** icon appears next to it in the detail view.  
+Clicking it opens the referenced file in the VS Code editor (split beside the current view).
+
+### Supported path formats
+
+| Format | Example |
+|--------|---------|
+| Relative path | `src/login.tsx` |
+| Relative path + line (`:`) | `src/login.tsx:42` |
+| Relative path + line (space + `L`) | `src/login.tsx L42` |
+| Absolute path | `C:\project\src\login.tsx` |
+
+### Base path resolution order
+
+1. **`targetRoot`** — set in the board's Settings dialog (saved to `rassure.json`)
+2. **Workspace folder** — the folder open in VS Code
+3. Error notification if neither is available
+
+Configure `targetRoot` via the board's **Settings dialog** (gear icon, top-right of the board).
 
 ---
 
@@ -168,6 +218,17 @@ Column order and selection can be customized in VS Code settings (see [below](#e
 ---
 
 ## Settings Customization
+
+### In-app Settings Dialog
+
+Click the **Settings button** (gear icon) in the top-right of the board.
+
+| Field | Description |
+|-------|-------------|
+| Ticket Storage Folder | Folder where ticket JSON files are stored. Use the folder icon to browse. |
+| Target Root Path | Base directory for resolving relative paths in the Target field ([see Smart Jump](#smart-jump)). Leave blank to use the VS Code workspace folder. |
+
+### VS Code Settings
 
 Open VS Code settings with `Ctrl+,` (`Cmd+,` on Mac) and search for **`Rassure`**.
 
@@ -319,14 +380,16 @@ MIT
 1. [インストール](#インストール)
 2. [はじめに — 保存フォルダの設定](#はじめに--保存フォルダの設定)
 3. [ボード画面](#ボード画面)
-4. [チケットの作成](#チケットの作成)
-5. [チケットの詳細・編集](#チケットの詳細編集)
-6. [コメントの追加](#コメントの追加)
-7. [Excel エクスポート](#excel-エクスポート)
-8. [設定のカスタマイズ](#設定のカスタマイズ)
-9. [指摘種別のカスタマイズ](#指摘種別のカスタマイズ)
-10. [チケットデータ形式（参考）](#チケットデータ形式参考)
-11. [開発・ビルド](#開発ビルド)
+4. [絞り込み・検索](#絞り込み検索)
+5. [チケットの作成](#チケットの作成)
+6. [チケットの詳細・編集](#チケットの詳細編集)
+7. [スマートジャンプ](#スマートジャンプ)
+8. [コメントの追加](#コメントの追加)
+9. [Excel エクスポート](#excel-エクスポート)
+10. [設定のカスタマイズ](#設定のカスタマイズ)
+11. [指摘種別のカスタマイズ](#指摘種別のカスタマイズ)
+12. [チケットデータ形式（参考）](#チケットデータ形式参考)
+13. [開発・ビルド](#開発ビルド)
 
 ---
 
@@ -395,6 +458,28 @@ Rassure: ボードを開く
 
 ---
 
+## 絞り込み・検索
+
+### ステータスフィルター
+
+ツールバーの **「ステータスフィルター」** ドロップダウンで、特定の状況のチケットのみ表示できます。
+
+| 選択値 | 表示対象 |
+|--------|----------|
+| （すべて） | 全チケット |
+| 未着手 | 未着手のみ |
+| 対応中 | 対応中のみ |
+| 解決済 | 解決済のみ |
+| クローズ | クローズのみ |
+
+### キーワード検索
+
+**検索ボックス**に入力すると **ID・指摘対象・指摘種別・説明** を対象にリアルタイム絞り込みを行います（大文字小文字不問）。
+
+ステータスフィルターと検索は同時に使用できます。
+
+---
+
 ## チケットの作成
 
 ボード右上の **「新規」ボタン**をクリックすると、チケット作成フォームが別タブで開きます。
@@ -424,6 +509,30 @@ Rassure: ボードを開く
 **「編集」ボタン**をクリックすると各フィールドが編集可能になります。
 
 編集後、**「保存」ボタン**で変更を保存します。「キャンセル」で編集前の状態に戻ります。
+
+---
+
+## スマートジャンプ
+
+詳細画面の **「指摘対象」** フィールドに値が入っている場合、右横に **「ファイルを開く」** アイコンが表示されます。  
+クリックすると、参照先ファイルを VS Code のエディターで開きます（分割表示）。
+
+### 対応するパス形式
+
+| 形式 | 例 |
+|------|----|
+| 相対パス | `src/login.tsx` |
+| 相対パス + 行番号（`:`） | `src/login.tsx:42` |
+| 相対パス + 行番号（スペース + `L`） | `src/login.tsx L42` |
+| 絶対パス | `C:\project\src\login.tsx` |
+
+### 起点パスの決定順
+
+1. **`targetRoot`** — ボードの設定ダイアログで設定した値（`rassure.json` に保存）
+2. **ワークスペースフォルダ** — VS Code で現在開いているフォルダ
+3. どちらも未設定の場合はエラー通知を表示
+
+`targetRoot` はボード右上の **「設定」ダイアログ**（歯車アイコン）から設定できます。
 
 ---
 
@@ -474,6 +583,17 @@ Rassure: Excel にエクスポート
 ---
 
 ## 設定のカスタマイズ
+
+### ボード内設定ダイアログ
+
+ボード右上の **「設定」ボタン**（歯車アイコン）から開く設定ダイアログで以下の項目を変更できます。
+
+| 項目 | 説明 |
+|------|------|
+| チケット保存フォルダ | チケット JSON ファイルを保存するフォルダ。フォルダアイコンで参照可能。 |
+| 指摘対象のルートパス | 「指摘対象」フィールドの相対パスを解決する起点フォルダ（[スマートジャンプ参照](#スマートジャンプ)）。空欄の場合はワークスペースフォルダを使用。 |
+
+### VS Code 設定
 
 `Ctrl+,`（Mac: `Cmd+,`）で VS Code の設定を開き、検索欄に **`Rassure`** と入力すると設定項目が表示されます。
 

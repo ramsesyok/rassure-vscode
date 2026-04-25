@@ -17,14 +17,16 @@ No database or server required — works in closed network environments.
 1. [Installation](#installation)
 2. [Getting Started — Setting the Storage Folder](#getting-started--setting-the-storage-folder)
 3. [Board View](#board-view)
-4. [Creating a Ticket](#creating-a-ticket)
-5. [Ticket Detail & Edit](#ticket-detail--edit)
-6. [Adding Comments](#adding-comments)
-7. [Excel Export](#excel-export)
-8. [Settings](#settings)
-9. [Customizing Categories](#customizing-categories)
-10. [Ticket Data Format](#ticket-data-format)
-11. [Development & Build](#development--build)
+4. [Filtering & Search](#filtering--search)
+5. [Creating a Ticket](#creating-a-ticket)
+6. [Ticket Detail & Edit](#ticket-detail--edit)
+7. [Smart Jump](#smart-jump)
+8. [Adding Comments](#adding-comments)
+9. [Excel Export](#excel-export)
+10. [Settings](#settings)
+11. [Customizing Categories](#customizing-categories)
+12. [Ticket Data Format](#ticket-data-format)
+13. [Development & Build](#development--build)
 
 ---
 
@@ -99,6 +101,31 @@ All tickets in the storage folder are displayed as a table.
 
 ---
 
+## Filtering & Search
+
+The board toolbar provides two ways to narrow down tickets without leaving the board.
+
+### Status Filter
+
+Click the **Status** dropdown in the toolbar to show only tickets with a specific status.
+
+| Selection | Result |
+|-----------|--------|
+| (All) | Show all tickets regardless of status |
+| Open | Show only Open tickets |
+| In Progress | Show only In Progress tickets |
+| Resolved | Show only Resolved tickets |
+| Closed | Show only Closed tickets |
+
+### Keyword Search
+
+Type in the **search box** in the toolbar to filter tickets in real time.  
+The search matches against **ID, Target, Category, and Description** fields (case-insensitive).
+
+Both filters can be combined — for example, show only "In Progress" tickets that mention "login".
+
+---
+
 ## Creating a Ticket
 
 Click the **New button** in the top-right of the board to open the ticket creation form.
@@ -134,6 +161,45 @@ Click the **Edit button** to make fields editable.
 ![Ticket edit mode](docs/images/06_ticket-edit.png)
 
 Click **Save** to apply changes, or **Cancel** to discard them.
+
+---
+
+## Smart Jump
+
+In the detail panel, a small **Open File** icon appears next to the **Target** field when it contains a value.  
+Clicking it opens the referenced file in the VS Code editor (in a split panel beside the current view).
+
+### Path formats supported
+
+| Format | Example |
+|--------|---------|
+| Relative path | `src/login.tsx` |
+| Relative path with line number (`:`) | `src/login.tsx:42` |
+| Relative path with line number (space + `L`) | `src/login.tsx L42` |
+| Absolute path | `C:\project\src\login.tsx` |
+
+### Base path resolution
+
+The base directory used to resolve relative paths is determined in this order:
+
+1. **`targetRoot`** — set in the board's Settings dialog (saved to `rassure.json`)
+2. **Workspace folder** — the folder currently open in VS Code
+3. If neither is available, an error notification is shown
+
+**Configuring `targetRoot`:**
+
+Open the board's **Settings** dialog (gear icon, top-right) and enter a path in the **Target Root Path** field.  
+You can type a path directly or use the folder picker icon.
+
+```json
+// rassure.json (written automatically when saved from the Settings dialog)
+{
+  "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"],
+  "targetRoot": "C:\\project\\src"
+}
+```
+
+If the file does not exist at the resolved path, a warning notification is shown.
 
 ---
 
@@ -188,6 +254,17 @@ The column order and selection can be customized in VS Code settings ([see below
 ---
 
 ## Settings
+
+### In-app Settings Dialog
+
+Click the **Settings button** (gear icon) in the top-right of the board to open the in-app settings dialog.
+
+| Field | Description |
+|-------|-------------|
+| Ticket Storage Folder | Folder where ticket JSON files are stored. Use the folder icon to browse. |
+| Target Root Path | Base directory used to resolve relative paths in the Target field ([see Smart Jump](#smart-jump)). Leave blank to use the VS Code workspace folder. |
+
+### VS Code Settings
 
 Open VS Code settings with `Ctrl+,` (`Cmd+,` on Mac) and search for **`Rassure`**.
 
