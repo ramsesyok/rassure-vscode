@@ -52,6 +52,10 @@ export function postRequest<T = unknown>(type: string, payload?: unknown): Promi
   });
 }
 
+export function postNotification(type: string, payload?: unknown): void {
+  vscode.postMessage({ requestId: 0, type, payload });
+}
+
 export function onPush(handler: PushHandler): () => void {
   pushHandlers.push(handler);
   return () => {

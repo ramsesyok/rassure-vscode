@@ -56,7 +56,8 @@
     "updatedAt": "Updated At",
     "comments": "Comments",
     "commentPlaceholder": "Add a comment... (Ctrl+Enter to send)",
-    "ticketNotFound": "Ticket not found"
+    "ticketNotFound": "Ticket not found",
+    "openTargetFile": "Open File"
   },
   "settings": {
     "title": "Settings",

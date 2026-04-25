@@ -56,7 +56,8 @@
     "updatedAt": "更新日",
     "comments": "コメント",
     "commentPlaceholder": "コメントを追加... (Ctrl+Enter で送信)",
-    "ticketNotFound": "チケットが見つかりません"
+    "ticketNotFound": "チケットが見つかりません",
+    "openTargetFile": "ファイルを開く"
   },
   "settings": {
     "title": "設定",
