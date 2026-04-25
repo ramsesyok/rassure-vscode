@@ -203,19 +203,20 @@ Example: changing idPrefix to "No."
 
 ## Category Customization
 
-Place a plain-text file named `categories` in the ticket storage folder to customize the category dropdown options.
+Category dropdown options are configured via a `rassure.json` file (JSON with Comments format) in the ticket storage folder.
 
 If the file does not exist, it is auto-generated when the board opens with the following defaults:
 
-```
-Typo
-Missing Info
-Needs Review
-Change Request
-Question
+```jsonc
+{
+  // rassure configuration
+  "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"]
+}
 ```
 
-Edit it freely in a text editor — one category per line. Reload the board to apply changes.
+Edit `rassure.json` with any text editor to customize the list. Reload the board to apply changes.
+
+> **Migrating from an older version:** If a `categories` plain-text file exists in the folder and `rassure.json` does not, the extension automatically converts it to `rassure.json` when the board is opened. No manual action is required.
 
 ---
 
@@ -523,19 +524,20 @@ Rassure: Excel にエクスポート
 
 ## 指摘種別のカスタマイズ
 
-チケット保存フォルダに `categories` というテキストファイルを置くと、チケット作成・編集時の「指摘種別」プルダウンの選択肢をカスタマイズできます。
+チケット保存フォルダの `rassure.json`（JSON with Comments 形式）で、チケット作成・編集時の「指摘種別」プルダウンの選択肢をカスタマイズできます。
 
 ファイルが存在しない場合は、ボードを開いた際に以下の内容で自動生成されます。
 
-```
-誤記
-記載不足
-要確認
-修正依頼
-質問
+```jsonc
+{
+  // rassure configuration
+  "categories": ["誤記", "記載不足", "要確認", "修正依頼", "質問"]
+}
 ```
 
-1 行 1 カテゴリの形式でテキストエディタから自由に編集できます。編集後にボードを再読み込みすると反映されます。
+テキストエディタで `rassure.json` を編集し、ボードを再読み込みすると変更が反映されます。
+
+> **旧バージョンからのマイグレーション:** フォルダに `categories` テキストファイルが存在し、かつ `rassure.json` が存在しない場合、ボードを開いた際に自動的に `rassure.json` へ変換されます。手動作業は不要です。
 
 ---
 

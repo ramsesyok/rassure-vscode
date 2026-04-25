@@ -225,19 +225,20 @@ Example: changing idPrefix to "No."
 
 ## Customizing Categories
 
-Place a plain text file named `categories` in the ticket storage folder to customize the Category dropdown in the ticket form.
+Category dropdown options are configured via a `rassure.json` file (JSON with Comments format) in the ticket storage folder.
 
 If the file does not exist, it is created automatically when the board opens with these defaults:
 
-```
-Typo
-Missing Info
-Needs Review
-Change Request
-Question
+```jsonc
+{
+  // rassure configuration
+  "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"]
+}
 ```
 
-Edit the file with any text editor — one category per line. Reload the board to apply changes.
+Edit `rassure.json` with any text editor to customize the list. Reload the board to apply changes.
+
+> **Migrating from an older version:** If a `categories` plain-text file exists in the folder and `rassure.json` does not, the extension automatically converts it to `rassure.json` when the board is opened. No manual action is required.
 
 ---
 
