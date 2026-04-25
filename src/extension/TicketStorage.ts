@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { Ticket, Comment, Settings } from './types';
 import { t } from './locale';
+import { parse as parseJsonc } from 'jsonc-parser';
 
 export class TicketStorage {
   constructor(private readonly context: vscode.ExtensionContext) {}
@@ -92,7 +93,7 @@ export class TicketStorage {
     if (!fs.existsSync(folderPath)) {
       return [];
     }
-    const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.json') && !f.startsWith('_'));
+    const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.json') && !f.startsWith('_') && f !== 'rassure.json');
     const tickets: Ticket[] = [];
     for (const file of files) {
       try {
@@ -177,13 +178,13 @@ export class TicketStorage {
   getCategories(): string[] {
     try {
       const folderPath = this.getFolderPath();
-      const catFile = path.join(folderPath, 'categories');
-      if (fs.existsSync(catFile)) {
-        const content = fs.readFileSync(catFile, 'utf-8');
-        return content
-          .split(/\r?\n/)
-          .map((line: string) => line.trim())
-          .filter((line: string) => line.length > 0);
+      const configFile = path.join(folderPath, 'rassure.json');
+      if (fs.existsSync(configFile)) {
+        const content = fs.readFileSync(configFile, 'utf-8');
+        const config = parseJsonc(content) as { categories?: string[] };
+        if (Array.isArray(config?.categories)) {
+          return config.categories.filter((c: string) => typeof c === 'string' && c.trim().length > 0);
+        }
       }
     } catch {
       // fall through to empty
@@ -198,13 +199,39 @@ export class TicketStorage {
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath, { recursive: true });
       }
-      const catFile = path.join(folderPath, 'categories');
-      if (!fs.existsSync(catFile)) {
-        fs.writeFileSync(catFile, t('categories.default'), 'utf-8');
+      const configFile = path.join(folderPath, 'rassure.json');
+      if (!fs.existsSync(configFile)) {
+        const defaultCategories: string[] = t('categories.default')
+          .split(/\r?\n/)
+          .map((line: string) => line.trim())
+          .filter((line: string) => line.length > 0);
+        fs.writeFileSync(configFile, this.buildRassureJson(defaultCategories), 'utf-8');
       }
     } catch {
       // best effort
     }
+  }
+
+  migrateCategoriesIfNeeded(): void {
+    try {
+      const folderPath = this.getSettings().folderPath;
+      if (!folderPath) { return; }
+      const oldFile = path.join(folderPath, 'categories');
+      const configFile = path.join(folderPath, 'rassure.json');
+      if (!fs.existsSync(oldFile) || fs.existsSync(configFile)) { return; }
+      const categories = fs.readFileSync(oldFile, 'utf-8')
+        .split(/\r?\n/)
+        .map((line: string) => line.trim())
+        .filter((line: string) => line.length > 0);
+      fs.writeFileSync(configFile, this.buildRassureJson(categories), 'utf-8');
+    } catch {
+      // best effort
+    }
+  }
+
+  private buildRassureJson(categories: string[]): string {
+    const items = categories.map(c => JSON.stringify(c)).join(', ');
+    return `{\n  // rassure configuration\n  "categories": [${items}]\n}\n`;
   }
 
   static readonly DEFAULT_EXPORT_COLUMN_ORDER = ['ID','status','priority','target','category','description','comments','reporter','assignee','dueDate','createdAt','updatedAt'];
