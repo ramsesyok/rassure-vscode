@@ -62,7 +62,9 @@
   "settings": {
     "title": "Settings",
     "folderLabel": "Ticket Storage Folder",
-    "folderHelper": "Local folder or Windows network share path (e.g. \\\\server\\share\\tickets)"
+    "folderHelper": "Local folder or Windows network share path (e.g. \\\\server\\share\\tickets)",
+    "targetRootLabel": "Target Root Path (targetRoot)",
+    "targetRootHelper": "Base folder used to resolve relative paths in the Target field. Falls back to the workspace folder if left blank."
   },
   "comments": {
     "noComments": "No comments yet"

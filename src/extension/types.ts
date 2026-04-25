@@ -22,6 +22,7 @@ export interface Ticket {
 
 export interface Settings {
   folderPath: string;
+  targetRoot?: string;
 }
 
 export interface WebviewRequest<T = unknown> {

@@ -55,11 +55,38 @@ export class TicketStorage {
   getSettings(): Settings {
     const saved = this.context.globalState.get<string>('rassure.folderPath', '');
     const folderPath = saved || this.getWorkspaceFolderPath();
-    return { folderPath };
+    let targetRoot: string | undefined;
+    if (folderPath) {
+      try {
+        const configFile = path.join(folderPath, 'rassure.json');
+        if (fs.existsSync(configFile)) {
+          const config = JSON.parse(fs.readFileSync(configFile, 'utf-8')) as { targetRoot?: string };
+          targetRoot = config.targetRoot || undefined;
+        }
+      } catch { /* ignore */ }
+    }
+    return { folderPath, targetRoot };
   }
 
   async saveSettings(settings: Settings): Promise<Settings> {
     await this.context.globalState.update('rassure.folderPath', settings.folderPath);
+    if (settings.folderPath) {
+      try {
+        if (!fs.existsSync(settings.folderPath)) {
+          fs.mkdirSync(settings.folderPath, { recursive: true });
+        }
+        const configFile = path.join(settings.folderPath, 'rassure.json');
+        let existing: Record<string, unknown> = {};
+        if (fs.existsSync(configFile)) {
+          try { existing = JSON.parse(fs.readFileSync(configFile, 'utf-8')); } catch { /* ignore */ }
+        }
+        if (settings.targetRoot !== undefined) {
+          existing.targetRoot = settings.targetRoot || undefined;
+          if (!existing.targetRoot) { delete existing.targetRoot; }
+        }
+        fs.writeFileSync(configFile, JSON.stringify(existing, null, 2) + '\n', 'utf-8');
+      } catch { /* best effort */ }
+    }
     return settings;
   }
 
