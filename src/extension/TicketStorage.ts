@@ -2,9 +2,13 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { Ticket, Comment, Settings } from './types';
+import { Ticket, Comment, Settings, TicketFormat, RassureConfig } from './types';
+import { getSerializer, getSerializerByFileName, TicketSerializer } from './serializers';
 import { t } from './locale';
 
+
+const CONFIG_FILE = 'rassure.json';
+const TICKET_EXTENSIONS = ['.json', '.md'] as const;
 
 export class TicketStorage {
   constructor(private readonly context: vscode.ExtensionContext) {}
@@ -56,16 +60,8 @@ export class TicketStorage {
   getSettings(): Settings {
     const saved = this.context.globalState.get<string>('rassure.folderPath', '');
     const folderPath = saved || this.getWorkspaceFolderPath();
-    let targetRoot: string | undefined;
-    if (folderPath) {
-      try {
-        const configFile = path.join(folderPath, 'rassure.json');
-        if (fs.existsSync(configFile)) {
-          const config = JSON.parse(fs.readFileSync(configFile, 'utf-8')) as { targetRoot?: string };
-          targetRoot = config.targetRoot || undefined;
-        }
-      } catch { /* ignore */ }
-    }
+    const config = this.readRassureConfig(folderPath);
+    const targetRoot = config?.targetRoot || undefined;
     return { folderPath, targetRoot };
   }
 
@@ -79,7 +75,7 @@ export class TicketStorage {
         if (!fs.existsSync(settings.folderPath)) {
           fs.mkdirSync(settings.folderPath, { recursive: true });
         }
-        const configFile = path.join(settings.folderPath, 'rassure.json');
+        const configFile = path.join(settings.folderPath, CONFIG_FILE);
         let existing: Record<string, unknown> = {};
         if (fs.existsSync(configFile)) {
           try { existing = JSON.parse(fs.readFileSync(configFile, 'utf-8')); } catch { /* ignore */ }
@@ -122,13 +118,27 @@ export class TicketStorage {
     if (!fs.existsSync(folderPath)) {
       return [];
     }
-    const files = fs.readdirSync(folderPath).filter(f => f.endsWith('.json') && !f.startsWith('_') && f !== 'rassure.json');
+    const files = fs.readdirSync(folderPath).filter(f => isTicketFile(f));
     const tickets: Ticket[] = [];
-    for (const file of files) {
+    const seenIds = new Set<string>();
+    const formatPreference = this.getTicketFormat();
+    const preferredExt = getSerializer(formatPreference).extension;
+
+    // When the same id exists in both .json and .md, the configured format wins.
+    const sortedFiles = files.slice().sort((a, b) => {
+      const aPreferred = a.endsWith(preferredExt) ? 0 : 1;
+      const bPreferred = b.endsWith(preferredExt) ? 0 : 1;
+      return aPreferred - bPreferred;
+    });
+
+    for (const file of sortedFiles) {
+      const serializer = getSerializerByFileName(file);
+      if (!serializer) { continue; }
       try {
         const content = fs.readFileSync(path.join(folderPath, file), 'utf-8');
-        const ticket = JSON.parse(content) as Ticket;
-        if (ticket.id) {
+        const ticket = serializer.parse(content);
+        if (ticket.id && !seenIds.has(ticket.id)) {
+          seenIds.add(ticket.id);
           tickets.push(ticket);
         }
       } catch {
@@ -140,12 +150,12 @@ export class TicketStorage {
 
   getTicketDetail(id: string): Ticket {
     const folderPath = this.getFolderPath();
-    const filePath = path.join(folderPath, `${id}.json`);
-    if (!fs.existsSync(filePath)) {
+    const existing = this.findExistingTicketFile(folderPath, id);
+    if (!existing) {
       throw new Error(t('error.ticketNotFound', id));
     }
-    const content = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(content) as Ticket;
+    const content = fs.readFileSync(existing.filePath, 'utf-8');
+    return existing.serializer.parse(content);
   }
 
   saveTicket(data: Partial<Ticket>): Ticket {
@@ -157,41 +167,51 @@ export class TicketStorage {
     const now = new Date().toISOString();
 
     if (data.id) {
-      // Update existing
-      const existing = this.getTicketDetail(data.id);
+      // Update existing — keep the file's existing format
+      const existing = this.findExistingTicketFile(folderPath, data.id);
+      if (!existing) {
+        throw new Error(t('error.ticketNotFound', data.id));
+      }
+      const current = existing.serializer.parse(fs.readFileSync(existing.filePath, 'utf-8'));
       const updated: Ticket = {
-        ...existing,
+        ...current,
         ...data,
-        comments: existing.comments,
-        updatedAt: now
-      };
-      fs.writeFileSync(path.join(folderPath, `${updated.id}.json`), JSON.stringify(updated, null, 2), 'utf-8');
-      return updated;
-    } else {
-      // Create new
-      const id = this.generateId(folderPath);
-      const ticket: Ticket = {
-        id,
-        description: data.description || '',
-        target: data.target || '',
-        category: data.category || '',
-        status: data.status || 'open',
-        priority: data.priority || 'medium',
-        assignee: data.assignee || '',
-        dueDate: data.dueDate || '',
-        reporter: data.reporter || this.getCurrentUser(),
-        createdAt: now,
+        comments: current.comments,
         updatedAt: now,
-        comments: []
       };
-      fs.writeFileSync(path.join(folderPath, `${ticket.id}.json`), JSON.stringify(ticket, null, 2), 'utf-8');
-      return ticket;
+      fs.writeFileSync(existing.filePath, existing.serializer.stringify(updated), 'utf-8');
+      return updated;
     }
+
+    // Create new — use the configured format
+    const serializer = getSerializer(this.getTicketFormat());
+    const id = this.generateId(folderPath);
+    const ticket: Ticket = {
+      id,
+      description: data.description || '',
+      target: data.target || '',
+      category: data.category || '',
+      status: data.status || 'open',
+      priority: data.priority || 'medium',
+      assignee: data.assignee || '',
+      dueDate: data.dueDate || '',
+      reporter: data.reporter || this.getCurrentUser(),
+      createdAt: now,
+      updatedAt: now,
+      comments: [],
+    };
+    const filePath = path.join(folderPath, `${ticket.id}${serializer.extension}`);
+    fs.writeFileSync(filePath, serializer.stringify(ticket), 'utf-8');
+    return ticket;
   }
 
   addComment(ticketId: string, body: string): Ticket {
-    const ticket = this.getTicketDetail(ticketId);
     const folderPath = this.getFolderPath();
+    const existing = this.findExistingTicketFile(folderPath, ticketId);
+    if (!existing) {
+      throw new Error(t('error.ticketNotFound', ticketId));
+    }
+    const ticket = existing.serializer.parse(fs.readFileSync(existing.filePath, 'utf-8'));
     const comment: Comment = {
       id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       author: this.getCurrentUser(),
@@ -200,23 +220,15 @@ export class TicketStorage {
     };
     ticket.comments = [...(ticket.comments || []), comment];
     ticket.updatedAt = new Date().toISOString();
-    fs.writeFileSync(path.join(folderPath, `${ticket.id}.json`), JSON.stringify(ticket, null, 2), 'utf-8');
+    fs.writeFileSync(existing.filePath, existing.serializer.stringify(ticket), 'utf-8');
     return ticket;
   }
 
   getCategories(): string[] {
-    try {
-      const folderPath = this.getFolderPath();
-      const configFile = path.join(folderPath, 'rassure.json');
-      if (fs.existsSync(configFile)) {
-        const content = fs.readFileSync(configFile, 'utf-8');
-        const config = JSON.parse(content) as { categories?: unknown[] };
-        if (Array.isArray(config?.categories)) {
-          return (config.categories as unknown[]).filter((c): c is string => typeof c === 'string' && c.trim().length > 0);
-        }
-      }
-    } catch {
-      // fall through to empty
+    const folderPath = this.getSettings().folderPath;
+    const config = this.readRassureConfig(folderPath);
+    if (config && Array.isArray(config.categories)) {
+      return (config.categories as unknown[]).filter((c): c is string => typeof c === 'string' && c.trim().length > 0);
     }
     return [];
   }
@@ -228,13 +240,14 @@ export class TicketStorage {
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath, { recursive: true });
       }
-      const configFile = path.join(folderPath, 'rassure.json');
+      const configFile = path.join(folderPath, CONFIG_FILE);
       if (!fs.existsSync(configFile)) {
         const defaultCategories: string[] = t('categories.default')
           .split(/\r?\n/)
           .map((line: string) => line.trim())
           .filter((line: string) => line.length > 0);
-        fs.writeFileSync(configFile, this.buildRassureJson(defaultCategories), 'utf-8');
+        const format = this.detectInitialTicketFormat(folderPath);
+        fs.writeFileSync(configFile, this.buildRassureJson(defaultCategories, format), 'utf-8');
       }
     } catch {
       // best effort
@@ -256,17 +269,12 @@ export class TicketStorage {
     let basePath: string | undefined;
     const folderPath = this.getSettings().folderPath;
     if (folderPath) {
-      try {
-        const configFile = path.join(folderPath, 'rassure.json');
-        if (fs.existsSync(configFile)) {
-          const config = JSON.parse(fs.readFileSync(configFile, 'utf-8')) as { targetRoot?: string };
-          if (config.targetRoot) {
-            basePath = path.isAbsolute(config.targetRoot)
-              ? config.targetRoot
-              : path.join(folderPath, config.targetRoot);
-          }
-        }
-      } catch { /* ignore */ }
+      const config = this.readRassureConfig(folderPath);
+      if (config?.targetRoot) {
+        basePath = path.isAbsolute(config.targetRoot)
+          ? config.targetRoot
+          : path.join(folderPath, config.targetRoot);
+      }
     }
     if (!basePath) {
       basePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -297,21 +305,73 @@ export class TicketStorage {
       const folderPath = this.getSettings().folderPath;
       if (!folderPath) { return; }
       const oldFile = path.join(folderPath, 'categories');
-      const configFile = path.join(folderPath, 'rassure.json');
+      const configFile = path.join(folderPath, CONFIG_FILE);
       if (!fs.existsSync(oldFile) || fs.existsSync(configFile)) { return; }
       const categories = fs.readFileSync(oldFile, 'utf-8')
         .split(/\r?\n/)
         .map((line: string) => line.trim())
         .filter((line: string) => line.length > 0);
-      fs.writeFileSync(configFile, this.buildRassureJson(categories), 'utf-8');
+      const format = this.detectInitialTicketFormat(folderPath);
+      fs.writeFileSync(configFile, this.buildRassureJson(categories, format), 'utf-8');
       fs.unlinkSync(oldFile);
     } catch {
       // best effort
     }
   }
 
-  private buildRassureJson(categories: string[]): string {
-    return JSON.stringify({ categories }, null, 2) + '\n';
+  private buildRassureJson(categories: string[], ticketFormat: TicketFormat): string {
+    return JSON.stringify({ categories, ticketFormat }, null, 2) + '\n';
+  }
+
+  /**
+   * Decide the initial `ticketFormat` to write into a newly-created rassure.json.
+   * If the folder already contains legacy JSON tickets, stay on 'json' for compatibility.
+   * Otherwise default to 'markdown' for new storage folders.
+   */
+  private detectInitialTicketFormat(folderPath: string): TicketFormat {
+    try {
+      if (!fs.existsSync(folderPath)) { return 'markdown'; }
+      const files = fs.readdirSync(folderPath);
+      const hasJson = files.some(f => f.endsWith('.json') && isTicketFile(f));
+      const hasMarkdown = files.some(f => f.endsWith('.md') && isTicketFile(f));
+      if (hasJson && !hasMarkdown) { return 'json'; }
+      return 'markdown';
+    } catch {
+      return 'markdown';
+    }
+  }
+
+  private getTicketFormat(): TicketFormat {
+    const folderPath = this.getSettings().folderPath;
+    const config = this.readRassureConfig(folderPath);
+    return normalizeTicketFormat(config?.ticketFormat);
+  }
+
+  private readRassureConfig(folderPath: string): RassureConfig | undefined {
+    if (!folderPath) { return undefined; }
+    try {
+      const configFile = path.join(folderPath, CONFIG_FILE);
+      if (!fs.existsSync(configFile)) { return undefined; }
+      return JSON.parse(fs.readFileSync(configFile, 'utf-8')) as RassureConfig;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private findExistingTicketFile(folderPath: string, id: string): { filePath: string; serializer: TicketSerializer } | undefined {
+    const preferred = getSerializer(this.getTicketFormat());
+    const otherExt = preferred.extension === '.json' ? '.md' : '.json';
+    const candidates = [preferred.extension, otherExt];
+    for (const ext of candidates) {
+      const filePath = path.join(folderPath, `${id}${ext}`);
+      if (fs.existsSync(filePath)) {
+        const serializer = getSerializerByFileName(filePath);
+        if (serializer) {
+          return { filePath, serializer };
+        }
+      }
+    }
+    return undefined;
   }
 
   static readonly DEFAULT_EXPORT_COLUMN_ORDER = ['ID','status','priority','target','category','description','comments','reporter','assignee','dueDate','createdAt','updatedAt'];
@@ -347,14 +407,29 @@ export class TicketStorage {
   private generateId(folderPath: string): string {
     const prefix = this.getIdPrefix();
     const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const pattern = new RegExp(`^${escapedPrefix}\\d+\\.json$`);
+    const pattern = new RegExp(`^${escapedPrefix}(\\d+)\\.(json|md)$`);
     const files = fs.existsSync(folderPath)
-      ? fs.readdirSync(folderPath).filter((f: string) => pattern.test(f))
+      ? fs.readdirSync(folderPath)
       : [];
-    const nums = files
-      .map((f: string) => parseInt(f.slice(prefix.length, f.length - 5), 10))
-      .filter((n: number) => !isNaN(n));
+    const nums: number[] = [];
+    for (const file of files) {
+      const m = file.match(pattern);
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (!isNaN(n)) { nums.push(n); }
+      }
+    }
     const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
     return `${prefix}${String(next).padStart(3, '0')}`;
   }
+}
+
+function isTicketFile(fileName: string): boolean {
+  if (fileName === CONFIG_FILE) { return false; }
+  if (fileName.startsWith('_')) { return false; }
+  return TICKET_EXTENSIONS.some(ext => fileName.endsWith(ext));
+}
+
+function normalizeTicketFormat(value: unknown): TicketFormat {
+  return value === 'markdown' ? 'markdown' : 'json';
 }

@@ -306,7 +306,8 @@ Rassure: Excel にエクスポート
 
 ```json
 {
-  "categories": ["誤記", "記載不足", "要確認", "修正依頼", "質問"]
+  "categories": ["誤記", "記載不足", "要確認", "修正依頼", "質問"],
+  "ticketFormat": "markdown"
 }
 ```
 
@@ -318,7 +319,24 @@ Rassure: Excel にエクスポート
 
 ## チケットデータ形式（参考）
 
-チケットは保存フォルダに `#001.json` のような形式で保存されます（プレフィックスは変更可能）。
+チケットは保存フォルダに `#001.json` または `#001.md` の形式で保存されます（プレフィックスは変更可能）。
+
+保存形式は `rassure.json` の `ticketFormat` で切り替えられます。
+
+| 値 | 形式 | 拡張子 |
+|----|------|--------|
+| `"json"` | JSON | `.json` |
+| `"markdown"` | Markdown + フロントマター | `.md` |
+| 未設定 | JSON（後方互換） | `.json` |
+
+新しい保存フォルダ向けに `rassure.json` を自動生成する際の `ticketFormat` の既定値は以下のとおりです。
+
+- 既存の `.json` チケットがあるフォルダ → `"json"`（互換性維持）
+- それ以外 → `"markdown"`
+
+`ticketFormat` を変更しても既存ファイルは自動変換されません。新規作成・更新分のみが設定された形式で書かれ、`.json` と `.md` の両方が同じフォルダにあっても読み込み可能です。
+
+### JSON 形式
 
 ```json
 {
@@ -337,7 +355,51 @@ Rassure: Excel にエクスポート
 }
 ```
 
-JSON はプレーンテキストなので Git 管理やネットワーク共有フォルダでのチーム共有が可能です。
+### Markdown 形式
+
+[Foam](https://foambubble.github.io/) で参照できるよう、YAML フロントマターを含めた形式で出力します。
+
+```markdown
+---
+title: '#001 — ログイン画面のボタンラ'
+type: rassure-ticket
+tags:
+  - rassure
+  - ticket
+  - 誤記
+aliases:
+  - '#001'
+id: '#001'
+status: in_progress
+priority: medium
+target: login.tsx
+category: 誤記
+assignee: yamada
+dueDate: '2026-04-30'
+reporter: tanaka
+createdAt: '2026-04-12T09:00:00.000Z'
+updatedAt: '2026-04-15T11:30:00.000Z'
+---
+
+ログイン画面のボタンラベル「ログイン」が「ロギン」になっています。
+
+## 指摘対象
+
+login.tsx
+
+## Comments
+
+### 2026-04-12T10:00:00.000Z — yamada
+<!-- id: c-1712916000000-a1b2c -->
+
+確認しました。対応します。
+```
+
+- `title` は `<id> — <description 先頭 15 文字>` で自動生成されます
+- `tags` は固定タグ `rassure`、`ticket` に加えて `category` が動的に追加されます
+- `aliases` は `id` の値が入り、Foam の wikilink 解決に利用できます
+
+JSON / Markdown いずれもプレーンテキストなので、Git 管理やネットワーク共有フォルダでのチーム共有が可能です。
 
 ### status の値
 

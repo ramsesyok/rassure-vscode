@@ -25,6 +25,14 @@ export interface Settings {
   targetRoot?: string;
 }
 
+export type TicketFormat = 'json' | 'markdown';
+
+export interface RassureConfig {
+  categories?: string[];
+  targetRoot?: string;
+  ticketFormat?: TicketFormat;
+}
+
 export interface WebviewRequest<T = unknown> {
   requestId: number;
   type: string;

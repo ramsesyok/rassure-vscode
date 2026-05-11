@@ -308,7 +308,8 @@ If the file does not exist, it is created automatically when the board opens wit
 
 ```json
 {
-  "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"]
+  "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"],
+  "ticketFormat": "markdown"
 }
 ```
 
@@ -320,7 +321,24 @@ Edit `rassure.json` with any text editor to customize the list. Reload the board
 
 ## Ticket Data Format
 
-Tickets are saved as files like `#001.json` in the storage folder (prefix is configurable).
+Tickets are saved as files like `#001.json` or `#001.md` in the storage folder (prefix is configurable).
+
+The storage format is controlled by `ticketFormat` in `rassure.json`:
+
+| Value | Format | Extension |
+|-------|--------|-----------|
+| `"json"` | JSON | `.json` |
+| `"markdown"` | Markdown with front matter | `.md` |
+| (unset) | JSON (backward compatible) | `.json` |
+
+When `rassure.json` is created for a new storage folder, `ticketFormat` is initialized based on the folder contents:
+
+- A folder that already contains `.json` tickets → `"json"` (compatibility)
+- Otherwise → `"markdown"`
+
+Changing `ticketFormat` does **not** convert existing files. Only newly-created or updated tickets are written in the configured format, and both `.json` and `.md` files can coexist in the same folder.
+
+### JSON Format
 
 ```json
 {
@@ -339,7 +357,51 @@ Tickets are saved as files like `#001.json` in the storage folder (prefix is con
 }
 ```
 
-Plain JSON files can be shared via Git or a network folder.
+### Markdown Format
+
+Markdown tickets are written with a YAML front matter so they can be referenced from [Foam](https://foambubble.github.io/).
+
+```markdown
+---
+title: '#001 — Typo in the logi'
+type: rassure-ticket
+tags:
+  - rassure
+  - ticket
+  - Typo
+aliases:
+  - '#001'
+id: '#001'
+status: in_progress
+priority: medium
+target: login.tsx
+category: Typo
+assignee: alice
+dueDate: '2026-04-30'
+reporter: bob
+createdAt: '2026-04-12T09:00:00.000Z'
+updatedAt: '2026-04-15T11:30:00.000Z'
+---
+
+Typo in the login screen button label.
+
+## 指摘対象
+
+login.tsx
+
+## Comments
+
+### 2026-04-12T10:00:00.000Z — alice
+<!-- id: c-1712916000000-a1b2c -->
+
+Confirmed. Will fix.
+```
+
+- `title` is generated as `<id> — <first 15 chars of description>`
+- `tags` always includes the fixed tags `rassure` and `ticket`, plus the ticket's `category` when set
+- `aliases` contains the ticket `id` so it can be referenced from Foam wikilinks
+
+Both JSON and Markdown files are plain text and can be shared via Git or a network folder.
 
 ### `status` values
 
