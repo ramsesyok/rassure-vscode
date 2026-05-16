@@ -275,6 +275,7 @@ Open VS Code settings with `Ctrl+,` (`Cmd+,` on Mac) and search for **`Rassure`*
 | `rassure-vscode.username` | (OS username) | Display name recorded on tickets |
 | `rassure-vscode.idPrefix` | `#` | Prefix for ticket IDs and filenames |
 | `rassure-vscode.exportColumnOrder` | All 12 columns | Column order and selection for Excel export |
+| `rassure-vscode.defaultTicketFormat` | `json` | Initial `ticketFormat` written to a newly-created `rassure.json` (`json` or `markdown`) |
 
 ### Ticket ID Prefix
 
@@ -309,9 +310,11 @@ If the file does not exist, it is created automatically when the board opens wit
 ```json
 {
   "categories": ["Typo", "Missing Info", "Needs Review", "Change Request", "Question"],
-  "ticketFormat": "markdown"
+  "ticketFormat": "json"
 }
 ```
+
+The value of `ticketFormat` follows the VS Code setting `rassure-vscode.defaultTicketFormat` at the moment `rassure.json` is created (default: `"json"`).
 
 Edit `rassure.json` with any text editor to customize the list. Reload the board to apply changes.
 
@@ -331,12 +334,9 @@ The storage format is controlled by `ticketFormat` in `rassure.json`:
 | `"markdown"` | Markdown with front matter | `.md` |
 | (unset) | JSON (backward compatible) | `.json` |
 
-When `rassure.json` is created for a new storage folder, `ticketFormat` is initialized based on the folder contents:
+When `rassure.json` is created for a new storage folder, `ticketFormat` is initialized from the VS Code setting **`rassure-vscode.defaultTicketFormat`** (default: `"json"`). Change that setting before opening a new folder to start in Markdown by default.
 
-- A folder that already contains `.json` tickets → `"json"` (compatibility)
-- Otherwise → `"markdown"`
-
-Changing `ticketFormat` does **not** convert existing files. Only newly-created or updated tickets are written in the configured format, and both `.json` and `.md` files can coexist in the same folder.
+Changing `ticketFormat` in `rassure.json` does **not** convert existing files. Only newly-created or updated tickets are written in the configured format, and both `.json` and `.md` files can coexist in the same folder.
 
 ### JSON Format
 

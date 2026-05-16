@@ -246,7 +246,7 @@ export class TicketStorage {
           .split(/\r?\n/)
           .map((line: string) => line.trim())
           .filter((line: string) => line.length > 0);
-        const format = this.detectInitialTicketFormat(folderPath);
+        const format = this.getDefaultTicketFormat();
         fs.writeFileSync(configFile, this.buildRassureJson(defaultCategories, format), 'utf-8');
       }
     } catch {
@@ -311,7 +311,7 @@ export class TicketStorage {
         .split(/\r?\n/)
         .map((line: string) => line.trim())
         .filter((line: string) => line.length > 0);
-      const format = this.detectInitialTicketFormat(folderPath);
+      const format = this.getDefaultTicketFormat();
       fs.writeFileSync(configFile, this.buildRassureJson(categories, format), 'utf-8');
       fs.unlinkSync(oldFile);
     } catch {
@@ -324,21 +324,15 @@ export class TicketStorage {
   }
 
   /**
-   * Decide the initial `ticketFormat` to write into a newly-created rassure.json.
-   * If the folder already contains legacy JSON tickets, stay on 'json' for compatibility.
-   * Otherwise default to 'markdown' for new storage folders.
+   * Resolve the `ticketFormat` to write into a newly-created rassure.json.
+   * Reads the VS Code setting `rassure-vscode.defaultTicketFormat` and falls
+   * back to 'json' when the setting is unset or invalid.
    */
-  private detectInitialTicketFormat(folderPath: string): TicketFormat {
-    try {
-      if (!fs.existsSync(folderPath)) { return 'markdown'; }
-      const files = fs.readdirSync(folderPath);
-      const hasJson = files.some(f => f.endsWith('.json') && isTicketFile(f));
-      const hasMarkdown = files.some(f => f.endsWith('.md') && isTicketFile(f));
-      if (hasJson && !hasMarkdown) { return 'json'; }
-      return 'markdown';
-    } catch {
-      return 'markdown';
-    }
+  private getDefaultTicketFormat(): TicketFormat {
+    const configured = vscode.workspace
+      .getConfiguration('rassure-vscode')
+      .get<string>('defaultTicketFormat');
+    return normalizeTicketFormat(configured);
   }
 
   private getTicketFormat(): TicketFormat {

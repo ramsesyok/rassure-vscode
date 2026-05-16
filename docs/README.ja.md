@@ -273,6 +273,7 @@ Rassure: Excel にエクスポート
 | `rassure-vscode.username` | （OS ユーザー名） | チケットに記録する表示名 |
 | `rassure-vscode.idPrefix` | `#` | チケット ID・ファイル名の先頭に付与するプレフィックス |
 | `rassure-vscode.exportColumnOrder` | 全 12 列 | Excel エクスポート時の列の順序・取捨選択 |
+| `rassure-vscode.defaultTicketFormat` | `json` | `rassure.json` を新規作成する際に書き込む `ticketFormat` の初期値（`json` または `markdown`） |
 
 ### チケット ID プレフィックスの変更
 
@@ -307,9 +308,11 @@ Rassure: Excel にエクスポート
 ```json
 {
   "categories": ["誤記", "記載不足", "要確認", "修正依頼", "質問"],
-  "ticketFormat": "markdown"
+  "ticketFormat": "json"
 }
 ```
+
+`ticketFormat` の値は、`rassure.json` を作成する時点での VS Code 設定 `rassure-vscode.defaultTicketFormat` に従います（既定: `"json"`）。
 
 テキストエディタで `rassure.json` を編集し、ボードを再読み込みすると変更が反映されます。
 
@@ -329,12 +332,9 @@ Rassure: Excel にエクスポート
 | `"markdown"` | Markdown + フロントマター | `.md` |
 | 未設定 | JSON（後方互換） | `.json` |
 
-新しい保存フォルダ向けに `rassure.json` を自動生成する際の `ticketFormat` の既定値は以下のとおりです。
+新しい保存フォルダ向けに `rassure.json` を自動生成する際の `ticketFormat` の初期値は、VS Code 設定 **`rassure-vscode.defaultTicketFormat`** に従って決まります（既定: `"json"`）。Markdown 形式で始めたい場合は、新規フォルダを開く前にこの設定を変更してください。
 
-- 既存の `.json` チケットがあるフォルダ → `"json"`（互換性維持）
-- それ以外 → `"markdown"`
-
-`ticketFormat` を変更しても既存ファイルは自動変換されません。新規作成・更新分のみが設定された形式で書かれ、`.json` と `.md` の両方が同じフォルダにあっても読み込み可能です。
+`rassure.json` の `ticketFormat` を後から変更しても既存ファイルは自動変換されません。新規作成・更新分のみが設定された形式で書かれ、`.json` と `.md` の両方が同じフォルダにあっても読み込み可能です。
 
 ### JSON 形式
 
