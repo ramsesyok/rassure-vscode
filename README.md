@@ -20,13 +20,14 @@ No database or server required — works in closed network environments.
 4. [Filtering & Search](#filtering--search)
 5. [Creating a Ticket](#creating-a-ticket)
 6. [Ticket Detail & Edit](#ticket-detail--edit)
-7. [Smart Jump](#smart-jump)
-8. [Adding Comments](#adding-comments)
-9. [Excel Export](#excel-export)
-10. [Settings](#settings)
-11. [Customizing Categories](#customizing-categories)
-12. [Ticket Data Format](#ticket-data-format)
-13. [Development & Build](#development--build)
+7. [Right-Click Context Menu](#right-click-context-menu)
+8. [Smart Jump](#smart-jump)
+9. [Adding Comments](#adding-comments)
+10. [Excel Export](#excel-export)
+11. [Settings](#settings)
+12. [Customizing Categories](#customizing-categories)
+13. [Ticket Data Format](#ticket-data-format)
+14. [Development & Build](#development--build)
 
 ---
 
@@ -161,6 +162,35 @@ Click the **Edit button** to make fields editable.
 ![Ticket edit mode](docs/images/06_ticket-edit.png)
 
 Click **Save** to apply changes, or **Cancel** to discard them.
+
+---
+
+## Right-Click Context Menu
+
+Right-clicking a row in the board opens a context menu for quick status and priority changes without opening the detail panel.
+
+### Status Change
+
+Hover over **Change Status** to expand the submenu, then select the target status.
+
+| Menu Item | Status set |
+|-----------|-----------|
+| Open | `open` |
+| In Progress | `in_progress` |
+| Resolved | `resolved` |
+| Closed | `closed` |
+
+### Priority Change
+
+Hover over **Change Priority** to expand the submenu, then select the target priority.
+
+| Menu Item | Priority set |
+|-----------|-------------|
+| High | `high` |
+| Medium | `medium` |
+| Low | `low` |
+
+The ticket file is saved immediately when a value is selected. The board refreshes automatically to reflect the change.
 
 ---
 
