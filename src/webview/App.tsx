@@ -40,6 +40,14 @@ export const App: React.FC = () => {
     postRequest('openDetail', { id }).catch(() => {});
   };
 
+  const handleChangeStatus = (id: string, status: Ticket['status']) => {
+    postRequest('saveTicket', { id, status }).then(refresh).catch(() => {});
+  };
+
+  const handleChangePriority = (id: string, priority: Ticket['priority']) => {
+    postRequest('saveTicket', { id, priority }).then(refresh).catch(() => {});
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       <AppToolbar
@@ -59,6 +67,8 @@ export const App: React.FC = () => {
           loading={loading}
           error={error}
           onSelectTicket={handleSelectTicket}
+          onChangeStatus={handleChangeStatus}
+          onChangePriority={handleChangePriority}
         />
       </Box>
 
