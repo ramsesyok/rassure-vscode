@@ -73,6 +73,7 @@
     "statusLabel": "Status Filter"
   },
   "contextMenu": {
-    "changeStatus": "Change Status"
+    "changeStatus": "Change Status",
+    "changePriority": "Change Priority"
   }
 }

@@ -73,6 +73,7 @@
     "statusLabel": "ステータスフィルター"
   },
   "contextMenu": {
-    "changeStatus": "ステータスを変更"
+    "changeStatus": "ステータスを変更",
+    "changePriority": "優先度を変更"
   }
 }

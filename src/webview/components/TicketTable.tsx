@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,7 +12,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListSubheader from '@mui/material/ListSubheader';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useTranslation } from 'react-i18next';
 import { Ticket } from '../types';
 import { StatusChip } from './StatusChip';
@@ -22,6 +24,7 @@ import { DueDateLabel } from './DueDateLabel';
 type SortKey = 'id' | 'target' | 'category' | 'status' | 'priority' | 'assignee' | 'dueDate';
 
 const ALL_STATUSES: Ticket['status'][] = ['open', 'in_progress', 'resolved', 'closed'];
+const ALL_PRIORITIES: Ticket['priority'][] = ['high', 'medium', 'low'];
 
 interface Props {
   tickets: Ticket[];
@@ -29,6 +32,7 @@ interface Props {
   error: string | null;
   onSelectTicket: (id: string) => void;
   onChangeStatus: (id: string, status: Ticket['status']) => void;
+  onChangePriority: (id: string, priority: Ticket['priority']) => void;
 }
 
 interface ContextMenuState {
@@ -37,11 +41,15 @@ interface ContextMenuState {
   ticket: Ticket;
 }
 
-export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelectTicket, onChangeStatus }) => {
+export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelectTicket, onChangeStatus, onChangePriority }) => {
   const { t } = useTranslation();
   const [sortKey, setSortKey] = useState<SortKey>('id');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const [openSubmenu, setOpenSubmenu] = useState<'status' | 'priority' | null>(null);
+
+  const statusItemRef = useRef<HTMLLIElement>(null);
+  const priorityItemRef = useRef<HTMLLIElement>(null);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -61,17 +69,26 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
   const handleContextMenu = (event: React.MouseEvent, ticket: Ticket) => {
     event.preventDefault();
     setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, ticket });
+    setOpenSubmenu(null);
   };
 
-  const handleCloseMenu = () => {
+  const handleCloseAll = () => {
     setContextMenu(null);
+    setOpenSubmenu(null);
   };
 
   const handleStatusSelect = (status: Ticket['status']) => {
     if (contextMenu) {
       onChangeStatus(contextMenu.ticket.id, status);
     }
-    handleCloseMenu();
+    handleCloseAll();
+  };
+
+  const handlePrioritySelect = (priority: Ticket['priority']) => {
+    if (contextMenu) {
+      onChangePriority(contextMenu.ticket.id, priority);
+    }
+    handleCloseAll();
   };
 
   if (loading) {
@@ -147,13 +164,45 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
         </Table>
       </TableContainer>
 
+      {/* 親メニュー */}
       <Menu
         open={contextMenu !== null}
-        onClose={handleCloseMenu}
+        onClose={handleCloseAll}
         anchorReference="anchorPosition"
         anchorPosition={contextMenu ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
+        MenuListProps={{ disablePadding: false }}
       >
-        <ListSubheader sx={{ lineHeight: '32px' }}>{t('contextMenu.changeStatus')}</ListSubheader>
+        <MenuItem
+          ref={statusItemRef}
+          onMouseEnter={() => setOpenSubmenu('status')}
+        >
+          <ListItemText>{t('contextMenu.changeStatus')}</ListItemText>
+          <ListItemIcon sx={{ minWidth: 'unset', ml: 1 }}>
+            <ChevronRightIcon fontSize="small" />
+          </ListItemIcon>
+        </MenuItem>
+        <MenuItem
+          ref={priorityItemRef}
+          onMouseEnter={() => setOpenSubmenu('priority')}
+        >
+          <ListItemText>{t('contextMenu.changePriority')}</ListItemText>
+          <ListItemIcon sx={{ minWidth: 'unset', ml: 1 }}>
+            <ChevronRightIcon fontSize="small" />
+          </ListItemIcon>
+        </MenuItem>
+      </Menu>
+
+      {/* ステータス子メニュー */}
+      <Menu
+        open={openSubmenu === 'status' && contextMenu !== null}
+        onClose={handleCloseAll}
+        anchorEl={statusItemRef.current}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        disableAutoFocus
+        disableEnforceFocus
+        hideBackdrop
+      >
         {ALL_STATUSES.map(status => (
           <MenuItem
             key={status}
@@ -162,6 +211,29 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
             selected={contextMenu?.ticket.status === status}
           >
             <StatusChip status={status} />
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {/* 優先度子メニュー */}
+      <Menu
+        open={openSubmenu === 'priority' && contextMenu !== null}
+        onClose={handleCloseAll}
+        anchorEl={priorityItemRef.current}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        disableAutoFocus
+        disableEnforceFocus
+        hideBackdrop
+      >
+        {ALL_PRIORITIES.map(priority => (
+          <MenuItem
+            key={priority}
+            onClick={() => handlePrioritySelect(priority)}
+            disabled={contextMenu?.ticket.priority === priority}
+            selected={contextMenu?.ticket.priority === priority}
+          >
+            <PriorityChip priority={priority} />
           </MenuItem>
         ))}
       </Menu>
