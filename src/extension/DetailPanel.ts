@@ -4,6 +4,10 @@ import { BoardPanel } from './BoardPanel';
 import { WebviewRequest } from './types';
 import { getLocale } from './locale';
 
+function escapeAttr(s: string): string {
+  return s.replace(/[&"<>]/g, c => ({'&':'&amp;','"':'&quot;','<':'&lt;','>':'&gt;'})[c] ?? c);
+}
+
 function getNonce(): string {
   let text = '';
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -109,9 +113,9 @@ export class DetailPanel {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="${csp}">
-  <meta name="rassure-user" content="${currentUser}">
-  <meta name="rassure-lang" content="${lang}">
-  <meta name="rassure-ticket-id" content="${this._ticketId}">
+  <meta name="rassure-user" content="${escapeAttr(currentUser)}">
+  <meta name="rassure-lang" content="${escapeAttr(lang)}">
+  <meta name="rassure-ticket-id" content="${escapeAttr(this._ticketId)}">
   <link rel="stylesheet" href="${styleUri}">
   <title>Rassure — ${this._ticketId}</title>
 </head>

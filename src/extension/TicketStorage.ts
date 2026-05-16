@@ -284,7 +284,12 @@ export class TicketStorage {
       return;
     }
 
-    const absPath = path.isAbsolute(rawPath) ? rawPath : path.join(basePath, rawPath);
+    const absPath = path.resolve(basePath, rawPath);
+    if (!absPath.startsWith(path.resolve(basePath) + path.sep) &&
+        absPath !== path.resolve(basePath)) {
+      vscode.window.showErrorMessage(t('error.openFile.outsidePath'));
+      return;
+    }
 
     if (!fs.existsSync(absPath)) {
       vscode.window.showWarningMessage(t('error.openFile.notFound', absPath));
