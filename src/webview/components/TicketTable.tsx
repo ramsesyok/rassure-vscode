@@ -202,6 +202,8 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
         disableAutoFocus
         disableEnforceFocus
         hideBackdrop
+        sx={{ pointerEvents: 'none' }}
+        PaperProps={{ sx: { pointerEvents: 'auto' } }}
       >
         {ALL_STATUSES.map(status => (
           <MenuItem
@@ -225,6 +227,8 @@ export const TicketTable: React.FC<Props> = ({ tickets, loading, error, onSelect
         disableAutoFocus
         disableEnforceFocus
         hideBackdrop
+        sx={{ pointerEvents: 'none' }}
+        PaperProps={{ sx: { pointerEvents: 'auto' } }}
       >
         {ALL_PRIORITIES.map(priority => (
           <MenuItem
