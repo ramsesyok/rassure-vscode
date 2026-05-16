@@ -71,5 +71,8 @@
   },
   "filter": {
     "statusLabel": "ステータスフィルター"
+  },
+  "contextMenu": {
+    "changeStatus": "ステータスを変更"
   }
 }
