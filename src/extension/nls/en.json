@@ -26,5 +26,6 @@
   "worksheet.name": "Issues",
   "categories.default": "Typo\nMissing Info\nNeeds Review\nChange Request\nQuestion",
   "error.openFile.noBasePath": "Cannot open file: no workspace folder or targetRoot is configured in rassure.json.",
-  "error.openFile.notFound": "File not found. Searched: {0}"
+  "error.openFile.notFound": "File not found. Searched: {0}",
+  "error.openFile.outsidePath": "Cannot open file: path is outside the allowed directory."
 }

@@ -3,6 +3,10 @@ import { TicketStorage } from './TicketStorage';
 import { WebviewRequest } from './types';
 import { t, getLocale } from './locale';
 
+function escapeAttr(s: string): string {
+  return s.replace(/[&"<>]/g, c => ({'&':'&amp;','"':'&quot;','<':'&lt;','>':'&gt;'})[c] ?? c);
+}
+
 /** VS Code公式サンプルと同じ英数字ノンス生成（hex/base64不可） */
 function getNonce(): string {
   let text = '';
@@ -115,8 +119,8 @@ export class BoardPanel {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="${csp}">
-  <meta name="rassure-user" content="${currentUser}">
-  <meta name="rassure-lang" content="${lang}">
+  <meta name="rassure-user" content="${escapeAttr(currentUser)}">
+  <meta name="rassure-lang" content="${escapeAttr(lang)}">
   <meta name="rassure-hide-closed" content="${hideClosed}">
   <link rel="stylesheet" href="${styleUri}">
   <title>Rassure</title>
